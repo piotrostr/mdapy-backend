@@ -23,9 +23,53 @@ from matplotlib.backends.backend_pdf import PdfPages
 from scipy import optimize
 
 
+class Data:
+    def __init__(
+        self, 
+        ages, 
+        errors, 
+        sample_list, 
+        dataToLoad_MLA,
+        eight_six_ratios, 
+        eight_six_error, 
+        seven_six_ratios, 
+        seven_six_error, 
+        U238_decay_constant, 
+        U235_decay_constant, 
+        U238_U235,
+        excess_variance_206_238, 
+        excess_variance_207_206,
+        Sy_calibration_uncertainty_206_238, 
+        Sy_calibration_uncertainty_207_206,
+        decay_constant_uncertainty_U238, 
+        decay_constant_uncertainty_U235, 
+        Data_Type, 
+        best_age_cut_off
+    ):
+        self.ages = ages
+        self.errors = errors
+        self.sample_list = sample_list
+        self.dataToLoad_MLA = dataToLoad_MLA
+        self.eight_six_ratios = eight_six_ratios
+        self.eight_six_error = eight_six_error
+        self.seven_six_ratios = seven_six_ratios
+        self.seven_six_error = seven_six_error
+        self.U238_decay_constant = U238_decay_constant
+        self.U235_decay_constant = U235_decay_constant
+        self.U238_U235 = U238_U235
+        self.excess_variance_206_238 = excess_vairance_206_238
+        self.excess_variance_207_206 = excess_variance_207_206
+        self.Sy_calibration_uncertainty_206_238 = Sy_calibration_uncertainty_206_238
+        self.Sy_calibration_uncertainty_207_206 = Sy_calibration_uncertainty_207_206
+        self.decay_constant_uncertainty_U238 = decay_constant_uncertainty_U238 
+        self.decay_constant_uncertainty_U235 = decay_constant_uncertainty_U235
+        self.Data_Type = Data_Type
+        self.best_age_cut_off = best_age_cut_off
+        
+        
 #Compiles all the MDA calculators into one step 
 
-def MDA_Calculator(ages, errors, sample_list, dataToLoad_MLA, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235,excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off):
+def MDA_Calculator():
     
     YSG_MDA = YSG(ages, errors, sample_list, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off)
   
@@ -3759,7 +3803,6 @@ def radial_plots():
 # Code below obtained from detritalPy_v1.3: @authors: glennrsharman, jonathanpsharman, zoltansylvester
 
 def loadDataExcel(dataToLoad, Data_Type, mainSheet = 'Samples', dataSheet = 'Data', ID_col = 'Sample_ID'):
-    
     obj1 = []
     obj2 = []
     obj3 = []
@@ -3802,7 +3845,6 @@ def loadDataExcel(dataToLoad, Data_Type, mainSheet = 'Samples', dataSheet = 'Dat
     analyses_df = pd.concat(obj4, sort=False)
 
     return main_df, main_byid_df, samples_df, analyses_df, Data_Type
-
 
 
 #Check that the Data Loaded Properly & Review Unique Samples: code by morganbrooks
