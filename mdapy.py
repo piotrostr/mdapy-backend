@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def load_data(arrays, column_names, data_type): 
+def load_data(arrays, column_names, data_type):
     dataSheet = 'Data'
     ID_col = 'Sample_ID'
     obj1 = []
@@ -11,6 +11,7 @@ def load_data(arrays, column_names, data_type):
     analyses_df = pd.DataFrame(arrays, columns=column_names)
     main_df = pd.DataFrame(analyses_df['Sample_ID'].unique(), columns=['Sample_ID'])
     samples_df = main_df.copy()
+    dfs = {'Samples': samples_df, 'Data': main_df}
     for sample_ind in range(main_df.shape[0]):
         active_sample_id = main_df.loc[sample_ind,ID_col]
         active_UPb_data = dfs[dataSheet].loc[dfs[dataSheet][ID_col].isin([active_sample_id]),:]
@@ -27,7 +28,6 @@ def load_data(arrays, column_names, data_type):
                         main_df[colname] = (np.nan*np.empty(shape=(len(main_df),1))).tolist()
                         main_df[colname] = np.asarray(main_df[colname])
                     main_df.at[sample_ind,colname] = active_UPb_data[colname].values
-                    
     main_byid_df = main_df.copy()
     main_byid_df.set_index(ID_col,inplace=True, drop=False)
     obj1.append(main_df)
