@@ -43,14 +43,19 @@ def parse_params(data):
     )
 
 
+def parse_float(x):
+    if ',' in x:
+        return float(x.replace(',', '.'))
+    return x
+
 def parse_dfs(data):
     """
     :returns tuple: main_df, main_byid_df, samples_df, analyses_df 
     """
     arrays = data['table']['data']
     arrays = [[i['value'] for i in row] for row in arrays]
+    arrays = [list(map(parse_float, array)) for array in arrays]
     column_names = data['table']['columnLabels']
-    print(column_names)
     dataset = data['dataset']
     if dataset == 'Best Age and sx':
         data_type = 'Ages'
@@ -75,7 +80,6 @@ def sign(response):
 
 @app.route('/')
 def index():
-    print(mda.__dir__())
     return jsonify('MDAPy API home')
 
 
@@ -113,8 +117,6 @@ def calculate_all_mda_methods():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
-
-    print(parse_dfs(data))
     dataToLoad_MLA = ['Data/_.xlsx']  # bypass the excel save-requiring bug
     ( 
 	ages, errors, eight_six_ratios, eight_six_error,

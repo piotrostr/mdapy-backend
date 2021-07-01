@@ -10,6 +10,7 @@ def load_data(arrays, column_names, data_type):
     obj3 = []
     obj4 = []
     analyses_df = pd.DataFrame(arrays, columns=column_names)
+    analyses_df = analyses_df.astype(float, errors='ignore')
     main_df = pd.DataFrame(analyses_df['Sample_ID'].unique(), columns=['Sample_ID'])
     samples_df = main_df.copy()
     dfs = {'Samples': samples_df, 'Data': analyses_df}
