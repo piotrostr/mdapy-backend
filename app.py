@@ -181,21 +181,13 @@ def calculate_all_mda_methods():
     with open(fname, 'r') as f:
         svg = f.read()
     response = make_response(json.dumps([MDAs_1s_table.to_json(), json.dumps(svg)]))
-    return response
+    return sign(response)
     
-    # the above gets ALL the data for each of the individual plots, to be used for method #1
-    # each of the charts and tables for methods #2, #3 can be made using the data from #1
-    # hence I think Ill just split the methods so each is retrieved from a separate enpoint to speed it up
-    # but 
-    # Ill implement method #1 and #3 first as they use the same data, to be retrieved from the same endpoint
-
-    # method #1:
-    # mdapy.MDA_Calculator -> mdapy.Plot_MDA -> All_MDA_Methods_Plots.svg 
 
     #  ! problem with the above is that the plot contains all the plots at 
     #    once, while we need those split in fe
+    #  ! for now only YSG is working for method 3
 
-    # method #3:
-    # mdapy.MDA_Calculator -> mdapy.MDA_Strat_Plot -> Stratigraphic_Plots/*.svg
-    # for now only YSG is working
+    # isolate the calculation and plotting for the methods 2 and 3, 
+    # each of the plots per each separate endpoint
 
