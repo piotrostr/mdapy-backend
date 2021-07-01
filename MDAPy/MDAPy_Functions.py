@@ -9,6 +9,8 @@ Created Sep 2, 2020
 # Import required modules
 import pathlib
 import pandas as pd
+import matplotlib as mpl
+mpl.use('Agg')
 from matplotlib import pyplot as plt
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D

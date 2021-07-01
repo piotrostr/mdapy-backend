@@ -13,7 +13,7 @@ def parse_params(data):
         Data_Type = 'Ages'
     elif data['dataset'] == 'U-Pb 238/206 & Pb-Pb 207/206':
         Data_Type = '238U/206Pb_&_207Pb/206Pb'
-    sample_list = ['UK027', 'UK026']  # where to get this from? TODO
+    sample_list = ['UK027', 'UK025']  # where to get this from? TODO
     if data['sigma'] == '1 sx':
         sigma = 1
     elif data['sigma'] == '2 sx':
@@ -109,6 +109,8 @@ def calculate_all_mda_methods():
         return sign(response)
 
     data = json.loads(request.data)
+    with open('sample_data.json', 'w+') as f:
+        f.write(json.dumps(data))
     main_df, main_byid_df, samples_df, analyses_df = parse_dfs(data)
     (
         Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
@@ -117,7 +119,6 @@ def calculate_all_mda_methods():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
-    dataToLoad_MLA = ['Data/_.xlsx']  # bypass the excel save-requiring bug
     ( 
 	ages, errors, eight_six_ratios, eight_six_error,
         seven_six_ratios, seven_six_error, numGrains, labels,
@@ -144,6 +145,7 @@ def calculate_all_mda_methods():
 	decay_constant_uncertainty_U238, 
 	decay_constant_uncertainty_U235
     )
+    dataToLoad_MLA = ['Data/_.xlsx']  # bypass the excel save-requiring bug
     (
 	U238_decay_constant, U235_decay_constant, U238_U235, YSG_MDA,
 	YC1s_MDA, YC1s_cluster_arrays, YC2s_MDA, YC2s_cluster_arrays,
@@ -165,6 +167,10 @@ def calculate_all_mda_methods():
         Y3Za_MDA, Tau_MDA, YSP_MDA, YPP_MDA, MLA_MDA
     )
 
+    plotwidth = 10
+    plotheight = 7
+    Image_File_Option = 'svg'
+
     mdapy.Plot_MDA(
         MDAs_1s_table, all_MDA_data, sample_list, YSG_MDA, YC1s_MDA, 
         YC2s_MDA, YDZ_MDA, Y3Zo_MDA, Y3Za_MDA, Tau_MDA, YSP_MDA, YPP_MDA, 
@@ -174,7 +180,7 @@ def calculate_all_mda_methods():
     fname = 'Saved_Files/All_MDA_Methods_Plots/All_MDA_Methods_Plots.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response([MDAs_1s_table.to_json(), json.dumps(svg)])
+    response = make_response(json.dumps([MDAs_1s_table.to_json(), json.dumps(svg)]))
     return response
     
     # the above gets ALL the data for each of the individual plots, to be used for method #1
