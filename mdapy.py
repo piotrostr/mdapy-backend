@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def load_data(arrays, column_names, data_type):
@@ -11,7 +12,7 @@ def load_data(arrays, column_names, data_type):
     analyses_df = pd.DataFrame(arrays, columns=column_names)
     main_df = pd.DataFrame(analyses_df['Sample_ID'].unique(), columns=['Sample_ID'])
     samples_df = main_df.copy()
-    dfs = {'Samples': samples_df, 'Data': main_df}
+    dfs = {'Samples': samples_df, 'Data': analyses_df}
     for sample_ind in range(main_df.shape[0]):
         active_sample_id = main_df.loc[sample_ind,ID_col]
         active_UPb_data = dfs[dataSheet].loc[dfs[dataSheet][ID_col].isin([active_sample_id]),:]

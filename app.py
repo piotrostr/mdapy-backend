@@ -9,8 +9,11 @@ app = Flask(__name__)
 
 
 def parse_params(data):
-    Data_Type = data['dataset']
-    sample_list = ['UK027', 'UK025']  # where to get this from? TODO
+    if data['dataset'] == 'Best Age and sx':
+        Data_Type = 'Ages'
+    elif data['dataset'] == 'U-Pb 238/206 & Pb-Pb 207/206':
+        Data_Type = '238U/206Pb_&_207Pb/206Pb'
+    sample_list = ['UK027', 'UK026']  # where to get this from? TODO
     if data['sigma'] == '1 sx':
         sigma = 1
     elif data['sigma'] == '2 sx':
@@ -19,16 +22,18 @@ def parse_params(data):
         uncertainty = 'percent'
     else:
         uncertainty = 'absolute'
+    # the below assumes that the user will not input text instead of numbers for 
+    # both the decay constants
     best_age_cut_off = int(data['bestAgeCutOff'])
-    U238_decay_constant = data['primaryDecayConstant']
-    U235_decay_constant = data['secondaryDecayConstant']
-    U238_U235 = data['thirdDecayConstant']
-    excess_variance_206_238 = data['primaryLongTermVar']
-    excess_variance_207_206 = data['secondaryLongTermVar']
-    Sy_calibration_uncertainty_206_238 = data['primaryCalibrationUncertainty']
-    Sy_calibration_uncertainty_207_206 = data['secondaryCalibrationUncertainty']
-    decay_constant_uncertainty_U238 = data['primaryDecayUncertainty']
-    decay_constant_uncertainty_U235 = data['secondaryDecayUncertainty']
+    U238_decay_constant = eval(data['primaryDecayConstant'])
+    U235_decay_constant = eval(data['secondaryDecayConstant'])
+    U238_U235 = float(data['thirdDecayConstant'])
+    excess_variance_206_238 = float(data['primaryLongTermVar'])
+    excess_variance_207_206 = float(data['secondaryLongTermVar'])
+    Sy_calibration_uncertainty_206_238 = float(data['primaryCalibrationUncertainty'])
+    Sy_calibration_uncertainty_207_206 = float(data['secondaryCalibrationUncertainty'])
+    decay_constant_uncertainty_U238 = float(data['primaryDecayUncertainty'])
+    decay_constant_uncertainty_U235 = float(data['secondaryDecayUncertainty'])
     return ( 
         Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
         U238_decay_constant, U235_decay_constant, U238_U235,
@@ -44,6 +49,13 @@ def parse_dfs(data):
     """
     arrays = data['table']['data']
     arrays = [[i['value'] for i in row] for row in arrays]
+    column_names = data['table']['columnLabels']
+    print(column_names)
+    dataset = data['dataset']
+    if dataset == 'Best Age and sx':
+        data_type = 'Ages'
+    elif dataset == 'U-Pb 238/206 & Pb-Pb 207/206':
+        data_type = '238U/206Pb_&_207Pb/206Pb'
     return load_data(arrays, column_names, data_type)
 
 
@@ -74,7 +86,6 @@ def check_validity():
         response = make_response(jsonify(msg))
         return sign(response)
     data = json.loads(request.data)
-    column_names = data['table']['columnLabels']
     dataset = data['dataset']
     if dataset == 'Best Age and sx':
         data_type = 'Ages'
@@ -103,6 +114,7 @@ def calculate_all_mda_methods():
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
 
+    print(parse_dfs(data))
     dataToLoad_MLA = ['Data/_.xlsx']  # bypass the excel save-requiring bug
     ( 
 	ages, errors, eight_six_ratios, eight_six_error,
@@ -119,7 +131,8 @@ def calculate_all_mda_methods():
 	main_byid_df, 
 	sigma,
 	Data_Type,
-	uncertainty,best_age_cut_off,
+	uncertainty,
+        best_age_cut_off,
 	U238_decay_constant,
 	U235_decay_constant,
 	U238_U235,excess_variance_206_238,
@@ -155,6 +168,7 @@ def calculate_all_mda_methods():
         YC2s_MDA, YDZ_MDA, Y3Zo_MDA, Y3Za_MDA, Tau_MDA, YSP_MDA, YPP_MDA, 
         MLA_MDA, Image_File_Option, plotwidth, plotheight
     )
+
     fname = 'Saved_Files/All_MDA_Methods_Plots/All_MDA_Methods_Plots.svg'
     with open(fname, 'r') as f:
         svg = f.read()
