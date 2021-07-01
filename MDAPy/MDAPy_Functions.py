@@ -4167,9 +4167,12 @@ def sampleToData(sample_list, main_byid_df, sigma, Data_Type, uncertainty, best_
         sample_sheet_ = sample_sheet.reset_index(drop=True)
 
         ages_errors_calculated = pd.concat([Ages_Table, Errors_Table], axis=1)
+        fill = pd.DataFrame(['id'])
 
         with pd.ExcelWriter('Isoplot_Data/ages_errors_calculated.xlsx') as writer:  
             sample_sheet_.to_excel(writer, sheet_name='Samples')
+            fill.to_excel(writer, sheet_name='Samples', startcol=1,
+                          startrow=1, header=None, index=False)
             ages_errors_calculated.to_excel(writer, sheet_name='Data')
 
         dataToLoad_MLA = ['Isoplot_Data/ages_errors_calculated.xlsx']
@@ -5176,8 +5179,13 @@ def MLA(sample_list, dataToLoad_MLA):
     output = subprocess.check_output(["Rscript", 'R_Scripts/IsoPlotR.R', dataToLoad_MLA[0], samples], universal_newlines=True)
     output2 = subprocess.check_output(["Rscript", 'R_Scripts/IsoPlotR2.R', dataToLoad_MLA[0], samples], universal_newlines=True)
     # then we convert the json returned to a dictionary by reading it as a json format
-    MDA_Values = json.loads(output)
-    Error_Values = json.loads(output2)
+    try:
+        MDA_Values = json.loads(output)
+        Error_Values = json.loads(output2)
+    except json.JSONDecodeError:
+        MDA_Values = json.loads(output.split('\n')[-1])
+        Error_Values = json.loads(output2.split('\n')[-1])
+        
     # Then we print the dictionary returned by R from the peakfit function
     
     # print("\n") # I just printed a line between the numbers, you can delete this line anytime
@@ -5185,11 +5193,4 @@ def MLA(sample_list, dataToLoad_MLA):
     #print(peak_values['UK027'])
     # ![title](temp/teste_plot_UK017.png)
     
-    ds = [MDA_Values, Error_Values]
-    MLA_MDA_1sError = {}
-    for k in MDA_Values.keys():
-        MLA_MDA_1sError[k] = tuple(MLA_MDA_1sError[k] for MLA_MDA_1sError in ds)
-    MLA_MDA = []
-    MLA_MDA = list(MLA_MDA_1sError.values())
-    
-    return MLA_MDA
+    return list(zip(MDA_Values.values(), Error_Values.values()))
