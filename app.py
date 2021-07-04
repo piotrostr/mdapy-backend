@@ -48,6 +48,7 @@ def parse_float(x):
         return float(x.replace(',', '.'))
     return x
 
+
 def parse_dfs(data):
     """
     :returns tuple: main_df, main_byid_df, samples_df, analyses_df 
@@ -83,6 +84,8 @@ def index():
     return jsonify('MDAPy API home')
 
 
+# LOAD DATA
+
 @app.route('/validate', methods=['POST', 'OPTIONS'])
 def check_validity():
     if not len(request.data):
@@ -101,16 +104,15 @@ def check_validity():
     return sign(response)
 
 
+# CALCULATE ALL MDA METHODS AND PLOT
+
 @app.route('/calculate_all_mda_methods', methods=['POST', 'OPTIONS'])
 def calculate_all_mda_methods():
     if not len(request.data):
         msg = 'no data could be retrieved from your request'
         response = make_response(jsonify(msg))
         return sign(response)
-
     data = json.loads(request.data)
-    with open('sample_data.json', 'w+') as f:
-        f.write(json.dumps(data))
     main_df, main_byid_df, samples_df, analyses_df = parse_dfs(data)
     (
         Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
@@ -180,14 +182,112 @@ def calculate_all_mda_methods():
     fname = 'Saved_Files/All_MDA_Methods_Plots/All_MDA_Methods_Plots.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps([MDAs_1s_table.to_json(), json.dumps(svg)]))
+    response = make_response(json.dumps(
+            [MDAs_1s_table.to_json(), json.dumps(svg)]
+        )
+    )
     return sign(response)
-    
 
-    #  ! problem with the above is that the plot contains all the plots at 
-    #    once, while we need those split in fe
-    #  ! for now only YSG is working for method 3
 
-    # isolate the calculation and plotting for the methods 2 and 3, 
-    # each of the plots per each separate endpoint
+# CALCULATE INDIVIDUAL MDAS AND PLOT
+
+@app.route('/calculate_individual_YC1s', methods=['POST', 'OPTIONS'])
+def calculate_individual_YC1s():
+    if not len(request.data):
+        msg = 'no data could be retrieved from your request'
+        response = make_response(jsonify(msg))
+        return sign(response)
+    data = json.loads(request.data)
+    main_df, main_byid_df, samples_df, analyses_df = parse_dfs(data)
+    (
+        Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
+        U238_decay_constant, U235_decay_constant, U238_U235, 
+        excess_variance_206_238, excess_variance_207_206, 
+        Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
+        decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
+    ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
+
+    YC1s_MDA, YC1s_cluster_arrays = mdapy.YC1s(
+        ages, errors, sample_list,
+        eight_six_ratios, eight_six_error, seven_six_ratios,
+        seven_six_error, U238_decay_constant, U235_decay_constant,
+        U238_U235, excess_variance_206_238, excess_variance_207_206,
+        Sy_calibration_uncertainty_206_238,
+        Sy_calibration_uncertainty_207_206,
+        decay_constant_uncertainty_U238,
+        decay_constant_uncertainty_U235, Data_Type, best_age_cut_off,
+        min_cluster_size=2
+    )
+
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    _, table = mdapy.YC1s_outputs(
+        ages,
+        errors,
+        sample_list,
+        YC1s_MDA,
+        YC1s_cluster_arrays,
+        plotwidth,
+        plotheight,
+        age_addition_set_max_plot,
+        Image_File_Option,
+        min_cluster_size=2,
+    )
+
+    fname = 'Saved_Files/Individual_MDA_Plots/YC1s_Plots.svg'
+    with open(fname, 'r') as f:
+        svg = f.read()
+    response = make_response(json.dumps(
+            [table.to_json(), json.dumps(svg)]
+        )
+    )
+    return sign(response)
+
+
+# PLOT ALL SAMPLES WITH ONE MDA METHOD
+
+@app.route('/calculate_all_samples_YC1s', methods=['POST', 'OPTIONS'])
+def calculate_all_samples_YC1s():
+    if not len(request.data):
+        msg = 'no data could be retrieved from your request'
+        response = make_response(jsonify(msg))
+        return sign(response)
+    data = json.loads(request.data)
+    main_df, main_byid_df, samples_df, analyses_df = parse_dfs(data)
+    (
+        Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
+        U238_decay_constant, U235_decay_constant, U238_U235, 
+        excess_variance_206_238, excess_variance_207_206, 
+        Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
+        decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
+    ) = parse_params(data)
 
