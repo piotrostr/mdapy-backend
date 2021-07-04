@@ -5,8 +5,8 @@ from mdapy import load_data, validate_analyses_df
 from MDAPy import MDAPy_Functions as mdapy
 from flask import Flask, jsonify, request, make_response
 
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 def parse_params(data):
     if data['dataset'] == 'Best Age and sx':
@@ -264,6 +264,324 @@ def calculate_individual_YC1s():
     )
 
     fname = 'Saved_Files/Individual_MDA_Plots/YC1s_Plots.svg'
+    with open(fname, 'r') as f:
+        svg = f.read()
+    response = make_response(json.dumps(
+            [table.to_json(), json.dumps(svg)]
+        )
+    )
+    return sign(response)
+
+
+@app.route('/calculate_individual_YC2s', methods=['POST', 'OPTIONS'])
+def calculate_individual_YC2s():
+    if not len(request.data):
+        msg = 'no data could be retrieved from your request'
+        response = make_response(jsonify(msg))
+        return sign(response)
+    data = json.loads(request.data)
+    main_df, main_byid_df, samples_df, analyses_df = parse_dfs(data)
+    (
+        Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
+        U238_decay_constant, U235_decay_constant, U238_U235, 
+        excess_variance_206_238, excess_variance_207_206, 
+        Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
+        decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
+    ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
+
+    YC2s_MDA, YC2s_cluster_arrays = mdapy.YC2s(
+        ages, errors, sample_list,
+        eight_six_ratios, eight_six_error, seven_six_ratios,
+        seven_six_error, U238_decay_constant, U235_decay_constant,
+        U238_U235, excess_variance_206_238, excess_variance_207_206,
+        Sy_calibration_uncertainty_206_238,
+        Sy_calibration_uncertainty_207_206,
+        decay_constant_uncertainty_U238,
+        decay_constant_uncertainty_U235, Data_Type, best_age_cut_off,
+        min_cluster_size=2
+    )
+
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    _, table = mdapy.YC2s_outputs(
+        ages,
+        errors,
+        sample_list,
+        YC2s_MDA,
+        YC2s_cluster_arrays,
+        plotwidth,
+        plotheight,
+        age_addition_set_max_plot,
+        Image_File_Option,
+        min_cluster_size=2,
+    )
+
+    fname = 'Saved_Files/Individual_MDA_Plots/YC2s_Plots.svg'
+    with open(fname, 'r') as f:
+        svg = f.read()
+    response = make_response(json.dumps(
+            [table.to_json(), json.dumps(svg)]
+        )
+    )
+    return sign(response)
+
+
+@app.route('/calculate_individual_YSG', methods=['POST', 'OPTIONS'])
+def calculate_individual_YSG():
+    if not len(request.data):
+        msg = 'no data could be retrieved from your request'
+        response = make_response(jsonify(msg))
+        return sign(response)
+    data = json.loads(request.data)
+    main_df, main_byid_df, samples_df, analyses_df = parse_dfs(data)
+    (
+        Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
+        U238_decay_constant, U235_decay_constant, U238_U235, 
+        excess_variance_206_238, excess_variance_207_206, 
+        Sy_calibration_uncertainty_206_238, 
+        Sy_calibration_uncertainty_207_206, 
+        decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
+    ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
+
+    YSG_MDA = mdapy.YSG(
+        ages, errors, sample_list, excess_variance_206_238,
+        excess_variance_207_206,
+        Sy_calibration_uncertainty_206_238,
+        Sy_calibration_uncertainty_207_206,
+        decay_constant_uncertainty_U238,
+        decay_constant_uncertainty_U235, Data_Type,
+        best_age_cut_off
+    )
+
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    _, table = mdapy.YSG_outputs(
+        ages, errors, plotwidth, plotheight,
+        sample_list, YSG_MDA, age_addition_set_max_plot,
+        Image_File_Option
+    )
+
+    fname = 'Saved_Files/Individual_MDA_Plots/YSG_Plots.svg'
+    with open(fname, 'r') as f:
+        svg = f.read()
+    response = make_response(json.dumps(
+            [table.to_json(), json.dumps(svg)]
+        )
+    )
+    return sign(response)
+
+
+@app.route('/calculate_individual_Tau', methods=['POST', 'OPTIONS'])
+def calculate_individual_Tau():
+    if not len(request.data):
+        msg = 'no data could be retrieved from your request'
+        response = make_response(jsonify(msg))
+        return sign(response)
+    data = json.loads(request.data)
+    main_df, main_byid_df, samples_df, analyses_df = parse_dfs(data)
+    (
+        Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
+        U238_decay_constant, U235_decay_constant, U238_U235, 
+        excess_variance_206_238, excess_variance_207_206, 
+        Sy_calibration_uncertainty_206_238, 
+        Sy_calibration_uncertainty_207_206, 
+        decay_constant_uncertainty_U238, 
+        decay_constant_uncertainty_U235
+    ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
+
+    (
+        Tau_MDA, Tau_Grains, PDP_age, PDP, plot_max, 
+        ages_errors1s_filtered, tauMethod_WM, tauMethod_WM_err2s
+    )= mdapy.tau(
+        ages, errors, sample_list,
+        eight_six_ratios, eight_six_error, seven_six_ratios,
+        seven_six_error, U238_decay_constant, U235_decay_constant,
+        U238_U235, excess_variance_206_238, excess_variance_207_206,
+        Sy_calibration_uncertainty_206_238,
+        Sy_calibration_uncertainty_207_206,
+        decay_constant_uncertainty_U238, 
+        decay_constant_uncertainty_U235, Data_Type, best_age_cut_off, 
+        min_cluster_size=3, thres=0.01, minDist=1, xdif=1, x1=0, x2=4000
+    )
+
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    _, table = mdapy.Tau_outputs(
+        ages, errors, sample_list, eight_six_ratios,
+        eight_six_error, seven_six_ratios, seven_six_error,
+        U238_decay_constant, U235_decay_constant, U238_U235, Data_Type,
+        best_age_cut_off, plotwidth, plotheight, Image_File_Option,
+        min_cluster_size, thres, minDist, xdif, x1, x2
+    )
+
+    fname = 'Saved_Files/Individual_MDA_Plots/Tau_Plots.svg'
+    with open(fname, 'r') as f:
+        svg = f.read()
+    response = make_response(json.dumps(
+            [table.to_json(), json.dumps(svg)]
+        )
+    )
+    return sign(response)
+
+
+@app.route('/calculate_individual_YSP', methods=['POST', 'OPTIONS'])
+def calculate_individual_YSP():
+    if not len(request.data):
+        msg = 'no data could be retrieved from your request'
+        response = make_response(jsonify(msg))
+        return sign(response)
+    data = json.loads(request.data)
+    main_df, main_byid_df, samples_df, analyses_df = parse_dfs(data)
+    (
+        Data_Type, sample_list, sigma, uncertainty, best_age_cut_off, 
+        U238_decay_constant, U235_decay_constant, U238_U235, 
+        excess_variance_206_238, excess_variance_207_206, 
+        Sy_calibration_uncertainty_206_238, 
+        Sy_calibration_uncertainty_207_206, 
+        decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
+    ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
+
+    YSP_MDA, YSP_cluster = mdapy.YSP(
+        ages, errors, sample_list, eight_six_ratios,
+        eight_six_error, seven_six_ratios, seven_six_error,
+        U238_decay_constant, U235_decay_constant, U238_U235,
+        excess_variance_206_238, excess_variance_207_206,
+        Sy_calibration_uncertainty_206_238,
+        Sy_calibration_uncertainty_207_206,
+        decay_constant_uncertainty_U238, 
+        decay_constant_uncertainty_U235,
+        Data_Type, best_age_cut_off, 
+        min_cluster_size=2, MSWD_threshold=1
+    )
+
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    _, table = mdapy.YSP_outputs(
+        ages, errors, sample_list, YSP_MDA,
+        YSP_cluster, plotwidth, plotheight, 
+        age_addition_set_max_plot,
+        Image_File_Option, 
+        min_cluster_size,
+        MSWD_threshold
+    )
+
+    fname = 'Saved_Files/Individual_MDA_Plots/YSP_Plots.svg'
     with open(fname, 'r') as f:
         svg = f.read()
     response = make_response(json.dumps(
