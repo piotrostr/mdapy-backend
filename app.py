@@ -498,7 +498,7 @@ def calculate_individual_Tau():
         eight_six_error, seven_six_ratios, seven_six_error,
         U238_decay_constant, U235_decay_constant, U238_U235, Data_Type,
         best_age_cut_off, plotwidth, plotheight, Image_File_Option,
-        min_cluster_size, thres, minDist, xdif, x1, x2
+        min_cluster_size=3, thres=0.01, minDist=1, xdif=1, x1=0, x2=4000
     )
 
     fname = 'Saved_Files/Individual_MDA_Plots/Tau_Plots.svg'
@@ -577,8 +577,7 @@ def calculate_individual_YSP():
         YSP_cluster, plotwidth, plotheight, 
         age_addition_set_max_plot,
         Image_File_Option, 
-        min_cluster_size,
-        MSWD_threshold
+        min_cluster_size=2, MSWD_threshold=1
     )
 
     fname = 'Saved_Files/Individual_MDA_Plots/YSP_Plots.svg'

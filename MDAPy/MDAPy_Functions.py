@@ -496,1628 +496,6 @@ def MDA_Strat_Plot(YSG_MDA, YC1s_MDA, YC2s_MDA, YDZ_MDA, Y3Zo_MDA, Y3Za_MDA, Tau
     if not hasattr(ages[0], '__len__'):
         ages = [ages]
         errors = [errors]
-
-
-    #Plotting    
-    
-    #YSG
-    def YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option):
-        
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-        
-        YSGfig, YSGaxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = [] 
-        
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-       
-        YSG_array = np.array(YSG_MDA)
-        YSGMDAs = YSG_array[:,0]        
-        YSG_error1s = YSG_array[:,1]
-        YSG_MDAs_arrays = np.split(YSGMDAs,len(YSGMDAs))
-        YSG_error1s_arrays = np.split(YSG_error1s,len(YSGMDAs))   
-        YSG_sorted = []
-    
-        for i in range(N):
-            YSG_Zipped = list(zip(YSG_MDAs_arrays[i],YSG_error1s_arrays[i],sample_arrays[i]))
-            YSG_Zipped.sort(key=lambda d: d[0])
-            YSG_sorted.append([YSG_Zipped[0][0],YSG_Zipped[0][1],YSG_Zipped[0][2]])
-            YSG_sorted.sort(reverse=True)
-    
-        YSG_sorted_array = np.array(YSG_sorted)
-        YSG_MDA_sort = YSG_sorted_array[:,0]        
-        YSG_error_sort = YSG_sorted_array[:,1]
-        YSG_sample_sort = YSG_sorted_array[:,2]
-        YSG_MDAs_sorted_arrays = np.split(YSG_MDA_sort,len(YSG_MDA_sort))
-        YSG_error_sorted_arrays = np.split(YSG_error_sort,len(YSG_MDA_sort))
-        YSG_sample_arrays = np.split(YSG_sample_sort,len(YSG_MDA_sort))
-        YSG_Y_Max = np.array(YSG_MDA_sort, dtype='f')
-
-        for i in range(N):
-            samples = YSG_sample_arrays[i]
-            x_arraysi = x_arrays[i]
-            x_tick_adjust = 0
-            width = 0
-            YSG_MDAS_error_1s = list(zip(YSG_MDAs_sorted_arrays[i],YSG_error_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z, a) in enumerate(YSG_MDAS_error_1s): 
-                YSG_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
-                
-            for l, m, n, o in YSG_MDAS_error_1s:    
-                YSG_age_values = l 
-                YSG_error1s_values = m
-                YSG_age_plus_err = l+m
-                YSG_error2s_values = m*2
-                x_tick = n
-                sample = o
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                
-                YSGaxi.broken_barh([(x_tick, width)], (YSG_age_values-YSG_error2s_values, YSG_error1s_values), facecolors=('lightsteelblue'))
-                YSGaxi.broken_barh([(x_tick, width)], (YSG_age_values-YSG_error1s_values,YSG_error1s_values), facecolors=('cornflowerblue'))
-                YSGaxi.broken_barh([(x_tick, width)], (YSG_age_values, YSG_error1s_values), facecolors=('cornflowerblue'))
-                YSGaxi.broken_barh([(x_tick, width)], (YSG_age_values+YSG_error1s_values, YSG_error1s_values), facecolors=('lightsteelblue'))   
-                YSGaxi.hlines(y=YSG_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-        
-        for i in range(N):
-            YSGaxi.set_xticks(x_arrays)
-            #YSGaxi.set_xticklabels(YSG_sample_sort,rotation='vertical') 
-            
-        YSGaxi.hlines(y=YSG_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YSG')
-        YSGaxi.broken_barh([(0.15, 0)], (YSG_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        YSGaxi.broken_barh([(0.15, 0)], (YSG_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-
-        YSGaxi.set_ylabel('Age'+" " +'(Ma)', labelpad=25)
-        YSGaxi.set_yticks(np.arange(round(YSG_Y_Max[-1]-20),round(YSG_sorted[0][0]+20), 5))
-        plt.gca().invert_yaxis()
-        
-        YSGaxi.yaxis.grid(True)
-        YSGaxi.set_xlabel('Samples', labelpad=25)
-        
-        YSGaxi.set_title('YSG MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-        
-        if Image_File_Option == 'pdf':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.tiff')
-        
-        
-        
-        return YSGfig
-       
-
-    #YDZ
-    def YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option):
-        
-        #Sample_List
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-        
-        #YDZ
-        YDZ_array = np.array(YDZ_MDA)
-        YDZ_MDAs = YDZ_array[:,0]
-        YDZ_error1sP = YDZ_array[:,1]/2
-        YDZ_error1sM = YDZ_array[:,2]/2
-        YDZ_MDAs_arrays = np.split(YDZ_MDAs,len(YDZ_MDAs))
-        YDZ_error1sP_arrays = np.split(YDZ_error1sP,len(YDZ_MDAs))
-        YDZ_error1sM_arrays = np.split(YDZ_error1sM,len(YDZ_MDAs))
-    
-        YDZ_sorted = []
-    
-        for i in range(N):
-            YDZ_Zipped = list(zip(YDZ_MDAs_arrays[i],YDZ_error1sP_arrays[i],YDZ_error1sM_arrays, sample_arrays[i]))
-            YDZ_Zipped.sort(key=lambda d: d[0])
-            YDZ_sorted.append([YDZ_Zipped[0][0],YDZ_Zipped[0][1],YDZ_Zipped[0][2],YDZ_Zipped[0][3]])
-            YDZ_sorted.sort(reverse=True)
-    
-        YDZ_sorted_array = np.array(YDZ_sorted)
-        YDZ_MDA_sort = YDZ_sorted_array[:,0]        
-        YDZ_error1sP_sort = YDZ_sorted_array[:,1]
-        YDZ_error1sM_sort = YDZ_sorted_array[:,2]
-        YDZ_sample_sort = YDZ_sorted_array[:,3]
-        YDZ_MDAs_sorted_arrays = np.split(YDZ_MDA_sort,len(YDZ_MDA_sort))
-        YDZ_error1sP_sort_sorted_arrays = np.split(YDZ_error1sP_sort,len(YDZ_MDA_sort))
-        YDZ_error1sM_sort_sorted_arrays = np.split(YDZ_error1sM_sort,len(YDZ_MDA_sort))
-        YDZ_sample_arrays = np.split(YDZ_sample_sort,len(YDZ_MDA_sort))
-        YDZ_Y_Max = np.array(YDZ_MDA_sort, dtype='f')
-        
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-
-
-
-        YDZfig, YDZaxi = plt.subplots(figsize=(plotwidth, plotheight))
-        
-        
-        for i in range(N):
-
-            samples = YDZ_sample_arrays[i]
-            x_arraysi = x_arrays[i]  
-            
-            x_tick_adjust = 0
-            width = 0
-            
-            YDZ_MDAS_error_1s = list(zip(YDZ_MDAs_sorted_arrays[i],YDZ_error1sP_sort_sorted_arrays[i],YDZ_error1sM_sort_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (a,b,c,d,e) in enumerate(YDZ_MDAS_error_1s): 
-                YDZ_MDAS_error_1s[idx] = (float(a), float(b), float(c), float(d), str(e)) 
-            
-            for l, m, n, o, p in YDZ_MDAS_error_1s:    
-                YDZ_age_values = l 
-                YDZ_plus_1s = m
-                YDZ_minus_1s = n
-                YDZ_Plus_2s = m*2
-                YDZ_Minus_2s = n*2
-                x_tick = o
-                sample = p
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                    
-                YDZaxi.broken_barh([(x_tick, width)], (YDZ_age_values-YDZ_Minus_2s, YDZ_Minus_2s), facecolors=('lightsteelblue'))
-                YDZaxi.broken_barh([(x_tick, width)], (YDZ_age_values-YDZ_minus_1s,YDZ_minus_1s), facecolors=('cornflowerblue'))
-                YDZaxi.broken_barh([(x_tick, width)], (YDZ_age_values, YDZ_plus_1s), facecolors=('cornflowerblue'))
-                YDZaxi.broken_barh([(x_tick, width)], (YDZ_age_values+YDZ_plus_1s, YDZ_plus_1s), facecolors=('lightsteelblue'))   
-                YDZaxi.hlines(y=YDZ_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-                    
-        for i in range(N):
-            YDZaxi.set_xticks(x_arrays)
-            YDZaxi.set_xticklabels(YDZ_sample_sort, rotation='vertical')  
-            
-        YDZaxi.hlines(y=YDZ_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YDZ')
-        YDZaxi.broken_barh([(0.15, 0)], (YDZ_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        YDZaxi.broken_barh([(0.15, 0)], (YDZ_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-        
-    
-        YDZaxi.set_ylabel('Age'+" " +'(Ma)', labelpad=25)
-        YDZaxi.yaxis.grid(True)
-        
-        YDZaxi.set_yticks(np.arange(round(YDZ_Y_Max[-1]-20),round(YDZ_sorted[0][0]+20), 5))
-        
-        plt.gca().invert_yaxis()
-        
-        YDZaxi.set_xlabel('Samples', labelpad=25)
-      
-        YDZaxi.set_title('YDZ MDA: All Samples') 
-       
-        plt.legend(loc='upper left')
-   
-        
-        if Image_File_Option == 'pdf':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.tif')
-        
-        return 
-        
-    #YC1s
-    def YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option):
-        
-        #Sample_List
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-            
-        #YC1s
-        YC1s_array = np.array(YC1s_MDA)
-        YC1sMDAs = YC1s_array[:,0]        
-        YC1s_error1s = YC1s_array[:,1]
-        YC1s_MDAs_arrays = np.split(YC1sMDAs,len(YC1sMDAs))
-        YC1s_error1s_arrays = np.split(YC1s_error1s,len(YC1sMDAs))
-    
-        YC1s_sorted = []
-    
-        for i in range(N):
-            YC1s_Zipped = list(zip(YC1s_MDAs_arrays[i],YC1s_error1s_arrays[i],sample_arrays[i]))
-            YC1s_Zipped.sort(key=lambda d: d[0])
-            YC1s_sorted.append([YC1s_Zipped[0][0],YC1s_Zipped[0][1],YC1s_Zipped[0][2]])
-            YC1s_sorted.sort(reverse=True)
-    
-        YC1s_sorted_array = np.array(YC1s_sorted)
-        YC1s_MDA_sort = YC1s_sorted_array[:,0]        
-        YC1s_error_sort = YC1s_sorted_array[:,1]
-        YC1s_sample_sort = YC1s_sorted_array[:,2]
-        YC1s_MDAs_sorted_arrays = np.split(YC1s_MDA_sort,len(YC1s_MDA_sort))
-        YC1s_error_sorted_arrays = np.split(YC1s_error_sort,len(YC1s_MDA_sort))
-        YC1s_sample_arrays = np.split(YC1s_sample_sort,len(YC1s_MDA_sort))
-        YC1s_Y_Max = np.array(YC1s_MDA_sort, dtype='f')
-
-        
-        YC1sfig, YC1saxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = []  
-
-        for i in range(N):
-
-            samples = YC1s_sample_arrays[i]
-            x_arraysi = x_arrays[i]
-            
-            x_tick_adjust = 0
-            width = 0
-            
-            YC1s_MDAS_error_1s = list(zip(YC1s_MDAs_sorted_arrays[i],YC1s_error_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z, a) in enumerate(YC1s_MDAS_error_1s): 
-                YC1s_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
-           
-            for l, m, n, o in YC1s_MDAS_error_1s:
-                YC1s_age_values = l 
-                YC1s_error1s_values = m
-                YC1s_age_plus_err = l+m
-                YC1s_error2s_values = m*2
-                x_tick = n
-                samples = o
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                
-                YC1saxi.broken_barh([(x_tick, width)], (YC1s_age_values-YC1s_error2s_values, YC1s_error1s_values), facecolors=('lightsteelblue'))
-                YC1saxi.broken_barh([(x_tick, width)], (YC1s_age_values-YC1s_error1s_values,YC1s_error1s_values), facecolors=('cornflowerblue'))
-                YC1saxi.broken_barh([(x_tick, width)], (YC1s_age_values, YC1s_error1s_values), facecolors=('cornflowerblue'))
-                YC1saxi.broken_barh([(x_tick, width)], (YC1s_age_values+YC1s_error1s_values, YC1s_error1s_values), facecolors=('lightsteelblue'))   
-                YC1saxi.hlines(y=YC1s_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-                
-        
-        for i in range(N):
-            YC1saxi.set_xticks(x_arrays)
-            YC1saxi.set_xticklabels(YC1s_sample_sort, rotation='vertical') 
-        
-        YC1saxi.hlines(y=YC1s_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YC1s')
-        YC1saxi.broken_barh([(0.15, 0)], (YC1s_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        YC1saxi.broken_barh([(0.15, 0)], (YC1s_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-
-        YC1saxi.yaxis.grid(True)
-       
-        YC1saxi.set_yticks(np.arange(round(YC1s_Y_Max[-1]-10),round(YC1s_sorted[0][0]+10), 2))
-        
-        
-        plt.gca().invert_yaxis()
-        YC1saxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
-        YC1saxi.set_xlabel('Samples', labelpad=25)
-        
-        YC1saxi.set_title('YC1$\sigma$ MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-        if Image_File_Option == 'pdf':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.tif')
-         
-
-        
-        return 
-    
-    def YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option):
-        
-        #Sample_List
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-
-        
-        YC2sfig, YC2saxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = []  
-        
-        YC2s_array = np.array(YC2s_MDA)
-        YC2s_MDAs = YC2s_array[:,0]
-        YC2s_error1s = YC2s_array[:,1]
-        YC2s_MDAs_arrays = np.split(YC2s_MDAs,len(YC2s_MDAs))
-        YC2s_error1s_arrays = np.split(YC2s_error1s,len(YC2s_MDAs))
-    
-        YC2s_sorted = []
-    
-        for i in range(N):
-            YC2s_Zipped = list(zip(YC2s_MDAs_arrays[i],YC2s_error1s_arrays[i],sample_arrays[i]))
-            YC2s_Zipped.sort(key=lambda d: d[0])
-            YC2s_sorted.append([YC2s_Zipped[0][0],YC2s_Zipped[0][1],YC2s_Zipped[0][2]])
-            YC2s_sorted.sort(reverse=True)
-    
-        YC2s_sorted_array = np.array(YC2s_sorted)
-        YC2s_MDA_sort = YC2s_sorted_array[:,0]        
-        YC2s_error_sort = YC2s_sorted_array[:,1]
-        YC2s_sample_sort = YC2s_sorted_array[:,2]
-        YC2s_MDAs_sorted_arrays = np.split(YC2s_MDA_sort,len(YC2s_MDA_sort))
-        YC2s_error_sorted_arrays = np.split(YC2s_error_sort,len(YC2s_MDA_sort))
-        YC2s_sample_arrays = np.split(YC2s_sample_sort,len(YC2s_MDA_sort))
-        YC2s_Y_Max = np.array(YC2s_MDA_sort, dtype='f')
-
-
-        for i in range(N):
-
-            samples = YC2s_sample_arrays[i]
-            x_arraysi = x_arrays[i]
-            
-            x_tick_adjust = 0
-            width = 0
-            
-            YC2s_MDAS_error_1s = list(zip(YC2s_MDAs_sorted_arrays[i],YC2s_error_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z, a) in enumerate(YC2s_MDAS_error_1s): 
-                YC2s_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
-           
-            for l, m, n, o in YC2s_MDAS_error_1s:
-                YC2s_age_values = l 
-                YC2s_error1s_values = m
-                YC2s_age_plus_err = l+m
-                YC2s_error2s_values = m*2
-                x_tick = n
-                samples = o
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                
-                YC2saxi.broken_barh([(x_tick, width)], (YC2s_age_values-YC2s_error2s_values, YC2s_error1s_values), facecolors=('lightsteelblue'))
-                YC2saxi.broken_barh([(x_tick, width)], (YC2s_age_values-YC2s_error1s_values,YC2s_error1s_values), facecolors=('cornflowerblue'))
-                YC2saxi.broken_barh([(x_tick, width)], (YC2s_age_values, YC2s_error1s_values), facecolors=('cornflowerblue'))
-                YC2saxi.broken_barh([(x_tick, width)], (YC2s_age_values+YC2s_error1s_values, YC2s_error1s_values), facecolors=('lightsteelblue'))   
-                YC2saxi.hlines(y=YC2s_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-                
-        
-        for i in range(N):
-            YC2saxi.set_xticks(x_arrays)
-            YC2saxi.set_xticklabels(YC2s_sample_sort, rotation='vertical') 
-        
-        YC2saxi.hlines(y=YC2s_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YC2$\sigma$')
-        YC2saxi.broken_barh([(0.15, 0)], (YC2s_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        YC2saxi.broken_barh([(0.15, 0)], (YC2s_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-    
-        
-        YC2saxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
-        YC2saxi.yaxis.grid(True)  
-       
-        YC2saxi.set_yticks(np.arange(round(YC2s_Y_Max[-1]-10),round(YC2s_sorted[0][0]+10), 2))
-        
-        plt.gca().invert_yaxis()
-        YC2saxi.set_xlabel('Samples', labelpad=25)
-        
-        YC2saxi.set_title('YC2$\sigma$ MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-  
-        if Image_File_Option == 'pdf':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.tif')
-
-        
-        return 
-    
-    #Y3Zo
-    def Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option):
-      
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-            
-        #Y3Zo
-        Y3Zo_array = np.array(Y3Zo_MDA)
-        Y3Zo_MDAs = Y3Zo_array[:,0]
-        Y3Zo_error1s = Y3Zo_array[:,1]
-        Y3Zo_MDAs_arrays = np.split(Y3Zo_MDAs,len(Y3Zo_MDAs))
-        Y3Zo_error1s_arrays = np.split(Y3Zo_error1s,len(Y3Zo_MDAs))
-    
-        Y3Zo_sorted = []
-    
-        for i in range(N):
-            Y3Zo_Zipped = list(zip(Y3Zo_MDAs_arrays[i],Y3Zo_error1s_arrays[i],sample_arrays[i]))
-            Y3Zo_Zipped.sort(key=lambda d: d[0])
-            Y3Zo_sorted.append([Y3Zo_Zipped[0][0],Y3Zo_Zipped[0][1],Y3Zo_Zipped[0][2]])
-            Y3Zo_sorted.sort(reverse=True)
-    
-        Y3Zo_sorted_array = np.array(Y3Zo_sorted)
-        Y3Zo_MDA_sort = Y3Zo_sorted_array[:,0]        
-        Y3Zo_error_sort = Y3Zo_sorted_array[:,1]
-        Y3Zo_sample_sort = Y3Zo_sorted_array[:,2]
-        Y3Zo_MDAs_sorted_arrays = np.split(Y3Zo_MDA_sort,len(Y3Zo_MDA_sort))
-        Y3Zo_error_sorted_arrays = np.split(Y3Zo_error_sort,len(Y3Zo_MDA_sort))
-        Y3Zo_sample_arrays = np.split(Y3Zo_sample_sort,len(Y3Zo_MDA_sort))
-        Y3Zo_Y_Max = np.array(Y3Zo_MDA_sort, dtype='f')
-        
-        Y3Zofig, Y3Zoaxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = []  
-
-        for i in range(N):
-
-            samples = Y3Zo_sample_arrays[i]
-            x_arraysi = x_arrays[i]  
-            
-            x_tick_adjust = 0
-            width = 0
-            
-            Y3Zo_MDAS_error_1s = list(zip(Y3Zo_MDAs_sorted_arrays[i],Y3Zo_error_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z, a) in enumerate(Y3Zo_MDAS_error_1s): 
-                Y3Zo_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
-           
-            for l, m, n, o in Y3Zo_MDAS_error_1s:
-                Y3Zo_age_values = l 
-                Y3Zo_error1s_values = m
-                Y3Zo_age_plus_err = l+m
-                Y3Zo_error2s_values = m*2
-                x_tick = n
-                samples = o
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                
-                Y3Zoaxi.broken_barh([(x_tick, width)], (Y3Zo_age_values-Y3Zo_error2s_values, Y3Zo_error1s_values), facecolors=('lightsteelblue'))
-                Y3Zoaxi.broken_barh([(x_tick, width)], (Y3Zo_age_values-Y3Zo_error1s_values,Y3Zo_error1s_values), facecolors=('cornflowerblue'))
-                Y3Zoaxi.broken_barh([(x_tick, width)], (Y3Zo_age_values, Y3Zo_error1s_values), facecolors=('cornflowerblue'))
-                Y3Zoaxi.broken_barh([(x_tick, width)], (Y3Zo_age_values+Y3Zo_error1s_values, Y3Zo_error1s_values), facecolors=('lightsteelblue'))   
-                Y3Zoaxi.hlines(y=Y3Zo_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-                
-        
-        for i in range(N):
-            Y3Zoaxi.set_xticks(x_arrays)
-            Y3Zoaxi.set_xticklabels(Y3Zo_sample_sort, rotation='vertical') 
-        
-        Y3Zoaxi.hlines(y=Y3Zo_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Y3Zo')
-        Y3Zoaxi.broken_barh([(0.15, 0)], (Y3Zo_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        Y3Zoaxi.broken_barh([(0.15, 0)], (Y3Zo_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-    
-        Y3Zoaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
-        Y3Zoaxi.yaxis.grid(True)  
-        
-        Y3Zoaxi.set_yticks(np.arange(round(Y3Zo_Y_Max[-1]-20),round(Y3Zo_sorted[0][0]+20), 5))
-        
-        plt.gca().invert_yaxis()
-        Y3Zoaxi.set_xlabel('Samples', labelpad=25)
-        
-        Y3Zoaxi.set_title('Y3Zo MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-        if Image_File_Option == 'pdf':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.tif')
-        
-
-        
-        return 
-        
-    #Tau
-    def Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option):
-        
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-
-        #Tau
-        Tau_array = np.array(Tau_MDA)
-        Tau_MDAs = Tau_array[:,0]
-        Tau_error1s = Tau_array[:,1]
-        Tau_MDAs_arrays = np.split(Tau_MDAs,len(Tau_MDAs))
-        Tau_error1s_arrays = np.split(Tau_error1s,len(Tau_MDAs))
-    
-        Tau_sorted = []
-    
-        for i in range(N):
-            Tau_Zipped = list(zip(Tau_MDAs_arrays[i],Tau_error1s_arrays[i],sample_arrays[i]))
-            Tau_Zipped.sort(key=lambda d: d[0])
-            Tau_sorted.append([Tau_Zipped[0][0],Tau_Zipped[0][1],Tau_Zipped[0][2]])
-            Tau_sorted.sort(reverse=True)
-    
-        Tau_sorted_array = np.array(Tau_sorted)
-        Tau_MDA_sort = Tau_sorted_array[:,0]        
-        Tau_error_sort = Tau_sorted_array[:,1]
-        Tau_sample_sort = Tau_sorted_array[:,2]
-        Tau_MDAs_sorted_arrays = np.split(Tau_MDA_sort,len(Tau_MDA_sort))
-        Tau_error_sorted_arrays = np.split(Tau_error_sort,len(Tau_MDA_sort))
-        Tau_sample_arrays = np.split(Tau_sample_sort,len(Tau_MDA_sort))
-        Tau_Y_Max = np.array(Tau_MDA_sort, dtype='f')
-
-        Taufig, Tauaxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = []  
-
-        for i in range(N):
-
-            samples = Tau_sample_arrays[i]
-            x_arraysi = x_arrays[i]  
-            
-            x_tick_adjust = 0
-            width = 0
-            
-            Tau_MDAS_error_1s = list(zip(Tau_MDAs_sorted_arrays[i],Tau_error_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z, a) in enumerate(Tau_MDAS_error_1s): 
-                Tau_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
-           
-            for l, m, n, o in Tau_MDAS_error_1s:
-                Tau_age_values = l 
-                Tau_error1s_values = m
-                Tau_age_plus_err = l+m
-                Tau_error2s_values = m*2
-                x_tick = n
-                samples = o
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                
-                Tauaxi.broken_barh([(x_tick, width)], (Tau_age_values-Tau_error2s_values, Tau_error1s_values), facecolors=('lightsteelblue'))
-                Tauaxi.broken_barh([(x_tick, width)], (Tau_age_values-Tau_error1s_values,Tau_error1s_values), facecolors=('cornflowerblue'))
-                Tauaxi.broken_barh([(x_tick, width)], (Tau_age_values, Tau_error1s_values), facecolors=('cornflowerblue'))
-                Tauaxi.broken_barh([(x_tick, width)], (Tau_age_values+Tau_error1s_values, Tau_error1s_values), facecolors=('lightsteelblue'))   
-                Tauaxi.hlines(y=Tau_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-                
-        
-        for i in range(N):
-            Tauaxi.set_xticks(x_arrays)
-            Tauaxi.set_xticklabels(Tau_sample_sort, rotation='vertical') 
-        
-        Tauaxi.hlines(y=Tau_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Tau')
-        Tauaxi.broken_barh([(0.15, 0)], (Tau_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        Tauaxi.broken_barh([(0.15, 0)], (Tau_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-    
-        Tauaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
-        Tauaxi.yaxis.grid(True)  
-       
-        Tauaxi.set_yticks(np.arange(round(Tau_Y_Max[-1]-10),round(Tau_sorted[0][0]+10), 2))
-        
-        
-        plt.gca().invert_yaxis()
-        Tauaxi.set_xlabel('Samples', labelpad=25)
-        
-        Tauaxi.set_title('Tau MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-        if Image_File_Option == 'pdf':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.tif')
-        
-
-        
-        return 
-
-    
-    #Y3Za
-    def Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option):
-        
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-            
-        #Y3Za
-        Y3Za_array = np.array(Y3Za_MDA)
-        Y3Za_MDAs = Y3Za_array[:,0]
-        Y3Za_error1s = Y3Za_array[:,1]
-        Y3Za_MDAs_arrays = np.split(Y3Za_MDAs,len(Y3Za_MDAs))
-        Y3Za_error1s_arrays = np.split(Y3Za_error1s,len(Y3Za_MDAs))
-    
-        Y3Za_sorted = []
-    
-        for i in range(N):
-            Y3Za_Zipped = list(zip(Y3Za_MDAs_arrays[i],Y3Za_error1s_arrays[i],sample_arrays[i]))
-            Y3Za_Zipped.sort(key=lambda d: d[0])
-            Y3Za_sorted.append([Y3Za_Zipped[0][0],Y3Za_Zipped[0][1],Y3Za_Zipped[0][2]])
-            Y3Za_sorted.sort(reverse=True)
-    
-        Y3Za_sorted_array = np.array(Y3Za_sorted)
-        Y3Za_MDA_sort = Y3Za_sorted_array[:,0]        
-        Y3Za_error_sort = Y3Za_sorted_array[:,1]
-        Y3Za_sample_sort = Y3Za_sorted_array[:,2]
-        Y3Za_MDAs_sorted_arrays = np.split(Y3Za_MDA_sort,len(Y3Za_MDA_sort))
-        Y3Za_error_sorted_arrays = np.split(Y3Za_error_sort,len(Y3Za_MDA_sort))
-        Y3Za_sample_arrays = np.split(Y3Za_sample_sort,len(Y3Za_MDA_sort))
-        Y3Za_Y_Max = np.array(Y3Za_MDA_sort, dtype='f')
-
-        Y3Zafig, Y3Zaaxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = []  
-
-        for i in range(N):
-
-            samples = Y3Za_sample_arrays[i]
-            x_arraysi = x_arrays[i]  
-            
-            x_tick_adjust = 0
-            width = 0
-            
-            Y3Za_MDAS_error_1s = list(zip(Y3Za_MDAs_sorted_arrays[i],Y3Za_error_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z, a) in enumerate(Y3Za_MDAS_error_1s): 
-                Y3Za_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
-           
-            for l, m, n, o in Y3Za_MDAS_error_1s:
-                Y3Za_age_values = l 
-                Y3Za_error1s_values = m
-                Y3Za_age_plus_err = l+m
-                Y3Za_error2s_values = m*2
-                x_tick = n
-                samples = o
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                    
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                
-                Y3Zaaxi.broken_barh([(x_tick, width)], (Y3Za_age_values-Y3Za_error2s_values, Y3Za_error1s_values), facecolors=('lightsteelblue'))
-                Y3Zaaxi.broken_barh([(x_tick, width)], (Y3Za_age_values-Y3Za_error1s_values,Y3Za_error1s_values), facecolors=('cornflowerblue'))
-                Y3Zaaxi.broken_barh([(x_tick, width)], (Y3Za_age_values, Y3Za_error1s_values), facecolors=('cornflowerblue'))
-                Y3Zaaxi.broken_barh([(x_tick, width)], (Y3Za_age_values+Y3Za_error1s_values, Y3Za_error1s_values), facecolors=('lightsteelblue'))   
-                Y3Zaaxi.hlines(y=Y3Za_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-                
-        
-        for i in range(N):
-            Y3Zaaxi.set_xticks(x_arrays)
-            Y3Zaaxi.set_xticklabels(Y3Za_sample_sort, rotation='vertical') 
-        
-        Y3Zaaxi.hlines(y=Y3Za_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Y3Za')
-        Y3Zaaxi.broken_barh([(0.15, 0)], (Y3Za_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        Y3Zaaxi.broken_barh([(0.15, 0)], (Y3Za_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-    
-        Y3Zaaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
-        Y3Zaaxi.yaxis.grid(True)  
-        
-        Y3Zaaxi.set_yticks(np.arange(round(Y3Za_Y_Max[-1]-20),round(Y3Za_sorted[0][0]+20), 5))
-        
-        plt.gca().invert_yaxis()
-        Y3Zaaxi.set_xlabel('Samples', labelpad=25)
-        
-        Y3Zaaxi.set_title('Y3Za MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-        if Image_File_Option == 'pdf':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.tif')
-        
-
-        
-        return 
-
-    #YSP
-    def YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option):
-        
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-
-        YSP_array = np.array(YSP_MDA)
-        YSP_MDAs = YSP_array[:,0]
-        YSP_error1s = YSP_array[:,1]
-        YSP_MDAs_arrays = np.split(YSP_MDAs,len(YSP_MDAs))
-        YSP_error1s_arrays = np.split(YSP_error1s,len(YSP_MDAs))
-    
-        YSP_sorted = []
-    
-        for i in range(N):
-            YSP_Zipped = list(zip(YSP_MDAs_arrays[i],YSP_error1s_arrays[i],sample_arrays[i]))
-            YSP_Zipped.sort(key=lambda d: d[0])
-            YSP_sorted.append([YSP_Zipped[0][0],YSP_Zipped[0][1],YSP_Zipped[0][2]])
-            YSP_sorted.sort(reverse=True)
-    
-        YSP_sorted_array = np.array(YSP_sorted)
-        YSP_MDA_sort = YSP_sorted_array[:,0]        
-        YSP_error_sort = YSP_sorted_array[:,1]
-        YSP_sample_sort = YSP_sorted_array[:,2]
-        YSP_MDAs_sorted_arrays = np.split(YSP_MDA_sort,len(YSP_MDA_sort))
-        YSP_error_sorted_arrays = np.split(YSP_error_sort,len(YSP_MDA_sort))
-        YSP_sample_arrays = np.split(YSP_sample_sort,len(YSP_MDA_sort))
-        YSP_Y_Max = np.array(YSP_MDA_sort, dtype='f')
-
-        
-        YSPfig, YSPaxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = []  
-
-        for i in range(N):
-
-            samples = YSP_sample_arrays[i]
-            x_arraysi = x_arrays[i]  
-            
-            x_tick_adjust = 0
-            width = 0
-            
-            YSP_MDAS_error_1s = list(zip(YSP_MDAs_sorted_arrays[i],YSP_error_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z, a) in enumerate(YSP_MDAS_error_1s): 
-                YSP_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
-           
-            for l, m, n, o in YSP_MDAS_error_1s:
-                YSP_age_values = l 
-                YSP_error1s_values = m
-                YSP_age_plus_err = l+m
-                YSP_error2s_values = m*2
-                x_tick = n
-                samples = o
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                    
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                
-                YSPaxi.broken_barh([(x_tick, width)], (YSP_age_values-YSP_error2s_values, YSP_error1s_values), facecolors=('lightsteelblue'))
-                YSPaxi.broken_barh([(x_tick, width)], (YSP_age_values-YSP_error1s_values,YSP_error1s_values), facecolors=('cornflowerblue'))
-                YSPaxi.broken_barh([(x_tick, width)], (YSP_age_values, YSP_error1s_values), facecolors=('cornflowerblue'))
-                YSPaxi.broken_barh([(x_tick, width)], (YSP_age_values+YSP_error1s_values, YSP_error1s_values), facecolors=('lightsteelblue'))   
-                YSPaxi.hlines(y=YSP_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-                
-        
-        for i in range(N):
-            YSPaxi.set_xticks(x_arrays)
-            YSPaxi.set_xticklabels(YSP_sample_sort, rotation='vertical') 
-        
-        YSPaxi.hlines(y=YSP_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YSP')
-        YSPaxi.broken_barh([(0.15, 0)], (YSP_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        YSPaxi.broken_barh([(0.15, 0)], (YSP_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-    
-        YSPaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
-        YSPaxi.yaxis.grid(True)  
-       
-        YSPaxi.set_yticks(np.arange(round(YSP_Y_Max[-1]-10),round(YSP_sorted[0][0]+10), 2))
-        
-        plt.gca().invert_yaxis()
-        YSPaxi.set_xlabel('Samples', labelpad=25)
-        
-        YSPaxi.set_title('YSP MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-        if Image_File_Option == 'pdf':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.tif')
-
-        
-        return 
-
-    #YPP
-    def YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option):
-        
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-
-        YPP_array = np.array(YPP_MDA)
-        YPP_MDAs_arrays = np.split(YPP_array,len(YPP_array))
-    
-        YPP_sorted = []
-    
-        for i in range(N):
-            YPP_Zipped = list(zip(YPP_MDAs_arrays[i],sample_arrays[i]))
-            YPP_Zipped.sort(key=lambda d: d[0])
-            YPP_sorted.append([YPP_Zipped[0][0],YPP_Zipped[0][1]])
-            YPP_sorted.sort(reverse=True)
-    
-        YPP_sorted_array = np.array(YPP_sorted)
-        YPP_MDA_sort = YPP_sorted_array[:,0]       
-        YPP_sample_sort = YPP_sorted_array[:,1]
-        YPP_MDAs_sorted_arrays = np.split(YPP_MDA_sort,len(YPP_MDA_sort))
-        YPP_sample_arrays = np.split(YPP_sample_sort,len(YPP_MDA_sort))
-        YPP_Y_Max = np.array(YPP_MDA_sort, dtype='f')
-    
-
-        
-        YPPfig, YPPaxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = []  
-
-        for i in range(N):
-
-            samples = YPP_sample_arrays[i]
-            x_arraysi = x_arrays[i]
-            x_tick_adjust = 0
-            
-            YPP_MDAS_error_1s = list(zip(YPP_MDAs_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z) in enumerate(YPP_MDAS_error_1s): 
-                YPP_MDAS_error_1s[idx] = (float(x), float(y), str(z)) 
-           
-            for l, m, n in YPP_MDAS_error_1s:
-                YPP_age_values = l 
-                x_tick = m
-                samples = n
-                
-                YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0), facecolors=('midnightblue'))
-                YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0.33), facecolors=('midnightblue'))
-                YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0), facecolors=('midnightblue'))
-                YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0), facecolors=('midnightblue'))   
-        
-        for i in range(N):
-            YPPaxi.set_xticks(x_arrays)
-            YPPaxi.set_xticklabels(YPP_sample_sort, rotation='vertical') 
-        
-        YPPaxi.hlines(y=YPP_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YPP')
-        YPPaxi.broken_barh([(0.15, 0)], (YPP_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        YPPaxi.broken_barh([(0.15, 0)], (YPP_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-    
-        YPPaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
-        YPPaxi.yaxis.grid(True)  
-        
-        YPPaxi.set_yticks(np.arange(round(YPP_Y_Max[-1]-10),round(YPP_sorted[0][0]+10), 5))
-        
-        plt.gca().invert_yaxis()
-        YPPaxi.set_xlabel('Samples', labelpad=25)
-        
-        YPPaxi.set_title('YPP MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-        if Image_File_Option == 'pdf':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.tif')
-        
-
-        
-        return 
-
-    #MLA
-    def MLA_Strat_Plot(MLA_MDA, sample_list, Image_File_Option):
-        N = len(sample_list)
-        sample_array = np.array(sample_list)
-        sample_arrays = np.split(sample_array,len(sample_array))
-        
-        #MLA
-        MLA_array = np.array(MLA_MDA)
-        MLA_MDAs = MLA_array[:,0]
-        MLA_error1s = MLA_array[:,1]
-        MLA_MDAs_arrays = np.split(MLA_MDAs,len(MLA_MDAs))
-        MLA_error1s_arrays = np.split(MLA_error1s,len(MLA_MDAs))
-    
-        MLA_sorted = []
-    
-        for i in range(N):
-            MLA_Zipped = list(zip(MLA_MDAs_arrays[i],MLA_error1s_arrays[i],sample_arrays[i]))
-            MLA_Zipped.sort(key=lambda d: d[0])
-            MLA_sorted.append([MLA_Zipped[0][0],MLA_Zipped[0][1],MLA_Zipped[0][2]])
-            MLA_sorted.sort(reverse=True)
-    
-        MLA_sorted_array = np.array(MLA_sorted)
-        MLA_MDA_sort = MLA_sorted_array[:,0]        
-        MLA_error_sort = MLA_sorted_array[:,1]
-        MLA_sample_sort = MLA_sorted_array[:,2]
-        MLA_MDAs_sorted_arrays = np.split(MLA_MDA_sort,len(MLA_MDA_sort))
-        MLA_error_sorted_arrays = np.split(MLA_error_sort,len(MLA_MDA_sort))
-        MLA_sample_arrays = np.split(MLA_sample_sort,len(MLA_MDA_sort))
-        MLA_Y_Max = np.array(MLA_MDA_sort, dtype='f')
-       
-        
-        #Setting up the x-axis placements
-        for i in range(N): 
-            samplesi = sample_list[i]
-
-            def create_x(t, w, n, d):
-                return [t*x + w*n for x in range(d)]
-
-            t = 1 # sets of data
-            w = 0.3 # We generally want bars to be 0.8
-            n = 1 # first set of data
-            d = len(sample_list) # topics we're plotting
-            plot_x = create_x(t,w,n,d)
-            middle = [ a / 2.0 for a in plot_x]
-            middle_x_array = np.array(middle)
-            x_arrays = np.split(middle_x_array,len(sample_list))
-        
-        MLAfig, MLAaxi = plt.subplots(figsize=(plotwidth, plotheight))
-        width = []  
-
-        for i in range(N):
-
-            samples = MLA_sample_arrays[i]
-            x_arraysi = x_arrays[i]  
-            
-            x_tick_adjust = 0
-            width = 0
-            
-            MLA_MDAS_error_1s = list(zip(MLA_MDAs_sorted_arrays[i],MLA_error_sorted_arrays[i],x_arraysi,samples))
-            
-            for idx, (x, y, z, a) in enumerate(MLA_MDAS_error_1s): 
-                MLA_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
-           
-            for l, m, n, o in MLA_MDAS_error_1s:
-                MLA_age_values = l 
-                MLA_error1s_values = m
-                MLA_age_plus_err = l+m
-                MLA_error2s_values = m*2
-                x_tick = n
-                samples = o
-                
-                if N==1:
-                    x_tick_adjust = 0.0002
-                    width = 0.002
-                    x_tick = 0
-                    x_arrays = [0]
-                
-                if N==2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                
-                if N>2:
-                    x_tick_adjust = 0.002
-                    width = 0.02
-                    
-                if N>4:
-                    x_tick_adjust = 0.006
-                    width = 0.05
-                
-                if N>6:
-                    x_tick_adjust = 0.006
-                    width = 0.07
-                
-                if N>8:
-                    x_tick_adjust = 0.009
-                    width = 0.09
-                
-                if N>12:
-                    width=0.11
-                    x_tick_adjust=0.02
-                
-                if N>17:
-                    width=0.12
-                    x_tick_adjust=0.02
-                
-                if N>20:
-                    width=0.17
-                    x_tick_adjust=0.02
-                
-                MLAaxi.broken_barh([(x_tick, width)], (MLA_age_values-MLA_error2s_values, MLA_error1s_values), facecolors=('lightsteelblue'))
-                MLAaxi.broken_barh([(x_tick, width)], (MLA_age_values-MLA_error1s_values,MLA_error1s_values), facecolors=('cornflowerblue'))
-                MLAaxi.broken_barh([(x_tick, width)], (MLA_age_values, MLA_error1s_values), facecolors=('cornflowerblue'))
-                MLAaxi.broken_barh([(x_tick, width)], (MLA_age_values+MLA_error1s_values, MLA_error1s_values), facecolors=('lightsteelblue'))   
-                MLAaxi.hlines(y=MLA_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
-                
-        for i in range(N):
-            MLAaxi.set_xticks(x_arrays)
-            MLAaxi.set_xticklabels(MLA_sample_sort, rotation='vertical') 
-        
-        MLAaxi.hlines(y=MLA_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: MLA')
-        MLAaxi.broken_barh([(0.15, 0)], (MLA_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
-        MLAaxi.broken_barh([(0.15, 0)], (MLA_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
-    
-        MLAaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
-        MLAaxi.yaxis.grid(True)  
-        
-        MLAaxi.set_yticks(np.arange(round(MLA_Y_Max[-1]-10),round(MLA_sorted[0][0]+10), 2))
-        
-        plt.gca().invert_yaxis()
-        MLAaxi.set_xlabel('Samples', labelpad=25)
-        
-        MLAaxi.set_title('MLA MDA: All Samples') 
-        plt.legend(loc='upper left')
-        
-        if Image_File_Option == 'pdf':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.pdf')
-        if Image_File_Option == 'png':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.png')
-        if Image_File_Option == 'eps':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.eps')
-        if Image_File_Option == 'jpeg':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.jpeg')
-        if Image_File_Option == 'jpg':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.jpg')
-        if Image_File_Option == 'pgf':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.pgf')
-        if Image_File_Option == 'ps':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.ps')
-        if Image_File_Option == 'raw':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.raw')
-        if Image_File_Option == 'rgba':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.rgba')
-        if Image_File_Option == 'svg':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.svg')
-        if Image_File_Option == 'svgz':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.svgz')
-        if Image_File_Option == 'tif':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.tif')
-        if Image_File_Option == 'tiff':
-            MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.tif')
-        
-        
-        return 
         
     if MDA_Method == "YSG":
         Plot = YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option)
@@ -2145,6 +523,1613 @@ def MDA_Strat_Plot(YSG_MDA, YC1s_MDA, YC2s_MDA, YDZ_MDA, Y3Zo_MDA, Y3Za_MDA, Tau
         
     return Plot
 
+def YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option):
+
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    YSGfig, YSGaxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = [] 
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+    YSG_array = np.array(YSG_MDA)
+    YSGMDAs = YSG_array[:,0]        
+    YSG_error1s = YSG_array[:,1]
+    YSG_MDAs_arrays = np.split(YSGMDAs,len(YSGMDAs))
+    YSG_error1s_arrays = np.split(YSG_error1s,len(YSGMDAs))   
+    YSG_sorted = []
+
+    for i in range(N):
+        YSG_Zipped = list(zip(YSG_MDAs_arrays[i],YSG_error1s_arrays[i],sample_arrays[i]))
+        YSG_Zipped.sort(key=lambda d: d[0])
+        YSG_sorted.append([YSG_Zipped[0][0],YSG_Zipped[0][1],YSG_Zipped[0][2]])
+        YSG_sorted.sort(reverse=True)
+
+    YSG_sorted_array = np.array(YSG_sorted)
+    YSG_MDA_sort = YSG_sorted_array[:,0]        
+    YSG_error_sort = YSG_sorted_array[:,1]
+    YSG_sample_sort = YSG_sorted_array[:,2]
+    YSG_MDAs_sorted_arrays = np.split(YSG_MDA_sort,len(YSG_MDA_sort))
+    YSG_error_sorted_arrays = np.split(YSG_error_sort,len(YSG_MDA_sort))
+    YSG_sample_arrays = np.split(YSG_sample_sort,len(YSG_MDA_sort))
+    YSG_Y_Max = np.array(YSG_MDA_sort, dtype='f')
+
+    for i in range(N):
+        samples = YSG_sample_arrays[i]
+        x_arraysi = x_arrays[i]
+        x_tick_adjust = 0
+        width = 0
+        YSG_MDAS_error_1s = list(zip(YSG_MDAs_sorted_arrays[i],YSG_error_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z, a) in enumerate(YSG_MDAS_error_1s): 
+            YSG_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
+
+        for l, m, n, o in YSG_MDAS_error_1s:    
+            YSG_age_values = l 
+            YSG_error1s_values = m
+            YSG_age_plus_err = l+m
+            YSG_error2s_values = m*2
+            x_tick = n
+            sample = o
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            YSGaxi.broken_barh([(x_tick, width)], (YSG_age_values-YSG_error2s_values, YSG_error1s_values), facecolors=('lightsteelblue'))
+            YSGaxi.broken_barh([(x_tick, width)], (YSG_age_values-YSG_error1s_values,YSG_error1s_values), facecolors=('cornflowerblue'))
+            YSGaxi.broken_barh([(x_tick, width)], (YSG_age_values, YSG_error1s_values), facecolors=('cornflowerblue'))
+            YSGaxi.broken_barh([(x_tick, width)], (YSG_age_values+YSG_error1s_values, YSG_error1s_values), facecolors=('lightsteelblue'))   
+            YSGaxi.hlines(y=YSG_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+    for i in range(N):
+        YSGaxi.set_xticks(x_arrays)
+        #YSGaxi.set_xticklabels(YSG_sample_sort,rotation='vertical') 
+
+    YSGaxi.hlines(y=YSG_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YSG')
+    YSGaxi.broken_barh([(0.15, 0)], (YSG_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    YSGaxi.broken_barh([(0.15, 0)], (YSG_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+    YSGaxi.set_ylabel('Age'+" " +'(Ma)', labelpad=25)
+    YSGaxi.set_yticks(np.arange(round(YSG_Y_Max[-1]-20),round(YSG_sorted[0][0]+20), 5))
+    plt.gca().invert_yaxis()
+
+    YSGaxi.yaxis.grid(True)
+    YSGaxi.set_xlabel('Samples', labelpad=25)
+
+    YSGaxi.set_title('YSG MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+
+    if Image_File_Option == 'pdf':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        YSGfig.savefig('Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.tiff')
+
+
+
+    return YSGfig
+#YDZ
+def YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option):
+
+    #Sample_List
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #YDZ
+    YDZ_array = np.array(YDZ_MDA)
+    YDZ_MDAs = YDZ_array[:,0]
+    YDZ_error1sP = YDZ_array[:,1]/2
+    YDZ_error1sM = YDZ_array[:,2]/2
+    YDZ_MDAs_arrays = np.split(YDZ_MDAs,len(YDZ_MDAs))
+    YDZ_error1sP_arrays = np.split(YDZ_error1sP,len(YDZ_MDAs))
+    YDZ_error1sM_arrays = np.split(YDZ_error1sM,len(YDZ_MDAs))
+
+    YDZ_sorted = []
+
+    for i in range(N):
+        YDZ_Zipped = list(zip(YDZ_MDAs_arrays[i],YDZ_error1sP_arrays[i],YDZ_error1sM_arrays, sample_arrays[i]))
+        YDZ_Zipped.sort(key=lambda d: d[0])
+        YDZ_sorted.append([YDZ_Zipped[0][0],YDZ_Zipped[0][1],YDZ_Zipped[0][2],YDZ_Zipped[0][3]])
+        YDZ_sorted.sort(reverse=True)
+
+    YDZ_sorted_array = np.array(YDZ_sorted)
+    YDZ_MDA_sort = YDZ_sorted_array[:,0]        
+    YDZ_error1sP_sort = YDZ_sorted_array[:,1]
+    YDZ_error1sM_sort = YDZ_sorted_array[:,2]
+    YDZ_sample_sort = YDZ_sorted_array[:,3]
+    YDZ_MDAs_sorted_arrays = np.split(YDZ_MDA_sort,len(YDZ_MDA_sort))
+    YDZ_error1sP_sort_sorted_arrays = np.split(YDZ_error1sP_sort,len(YDZ_MDA_sort))
+    YDZ_error1sM_sort_sorted_arrays = np.split(YDZ_error1sM_sort,len(YDZ_MDA_sort))
+    YDZ_sample_arrays = np.split(YDZ_sample_sort,len(YDZ_MDA_sort))
+    YDZ_Y_Max = np.array(YDZ_MDA_sort, dtype='f')
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+
+
+    YDZfig, YDZaxi = plt.subplots(figsize=(plotwidth, plotheight))
+
+
+    for i in range(N):
+
+        samples = YDZ_sample_arrays[i]
+        x_arraysi = x_arrays[i]  
+
+        x_tick_adjust = 0
+        width = 0
+
+        YDZ_MDAS_error_1s = list(zip(YDZ_MDAs_sorted_arrays[i],YDZ_error1sP_sort_sorted_arrays[i],YDZ_error1sM_sort_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (a,b,c,d,e) in enumerate(YDZ_MDAS_error_1s): 
+            YDZ_MDAS_error_1s[idx] = (float(a), float(b), float(c), float(d), str(e)) 
+
+        for l, m, n, o, p in YDZ_MDAS_error_1s:    
+            YDZ_age_values = l 
+            YDZ_plus_1s = m
+            YDZ_minus_1s = n
+            YDZ_Plus_2s = m*2
+            YDZ_Minus_2s = n*2
+            x_tick = o
+            sample = p
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            YDZaxi.broken_barh([(x_tick, width)], (YDZ_age_values-YDZ_Minus_2s, YDZ_Minus_2s), facecolors=('lightsteelblue'))
+            YDZaxi.broken_barh([(x_tick, width)], (YDZ_age_values-YDZ_minus_1s,YDZ_minus_1s), facecolors=('cornflowerblue'))
+            YDZaxi.broken_barh([(x_tick, width)], (YDZ_age_values, YDZ_plus_1s), facecolors=('cornflowerblue'))
+            YDZaxi.broken_barh([(x_tick, width)], (YDZ_age_values+YDZ_plus_1s, YDZ_plus_1s), facecolors=('lightsteelblue'))   
+            YDZaxi.hlines(y=YDZ_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+    for i in range(N):
+        YDZaxi.set_xticks(x_arrays)
+        YDZaxi.set_xticklabels(YDZ_sample_sort, rotation='vertical')  
+
+    YDZaxi.hlines(y=YDZ_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YDZ')
+    YDZaxi.broken_barh([(0.15, 0)], (YDZ_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    YDZaxi.broken_barh([(0.15, 0)], (YDZ_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+
+    YDZaxi.set_ylabel('Age'+" " +'(Ma)', labelpad=25)
+    YDZaxi.yaxis.grid(True)
+
+    YDZaxi.set_yticks(np.arange(round(YDZ_Y_Max[-1]-20),round(YDZ_sorted[0][0]+20), 5))
+
+    plt.gca().invert_yaxis()
+
+    YDZaxi.set_xlabel('Samples', labelpad=25)
+
+    YDZaxi.set_title('YDZ MDA: All Samples') 
+
+    plt.legend(loc='upper left')
+
+
+    if Image_File_Option == 'pdf':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        YDZfig.savefig('Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.tif')
+
+    return 
+#YC1s
+def YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option):
+
+    #Sample_List
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+    #YC1s
+    YC1s_array = np.array(YC1s_MDA)
+    YC1sMDAs = YC1s_array[:,0]        
+    YC1s_error1s = YC1s_array[:,1]
+    YC1s_MDAs_arrays = np.split(YC1sMDAs,len(YC1sMDAs))
+    YC1s_error1s_arrays = np.split(YC1s_error1s,len(YC1sMDAs))
+
+    YC1s_sorted = []
+
+    for i in range(N):
+        YC1s_Zipped = list(zip(YC1s_MDAs_arrays[i],YC1s_error1s_arrays[i],sample_arrays[i]))
+        YC1s_Zipped.sort(key=lambda d: d[0])
+        YC1s_sorted.append([YC1s_Zipped[0][0],YC1s_Zipped[0][1],YC1s_Zipped[0][2]])
+        YC1s_sorted.sort(reverse=True)
+
+    YC1s_sorted_array = np.array(YC1s_sorted)
+    YC1s_MDA_sort = YC1s_sorted_array[:,0]        
+    YC1s_error_sort = YC1s_sorted_array[:,1]
+    YC1s_sample_sort = YC1s_sorted_array[:,2]
+    YC1s_MDAs_sorted_arrays = np.split(YC1s_MDA_sort,len(YC1s_MDA_sort))
+    YC1s_error_sorted_arrays = np.split(YC1s_error_sort,len(YC1s_MDA_sort))
+    YC1s_sample_arrays = np.split(YC1s_sample_sort,len(YC1s_MDA_sort))
+    YC1s_Y_Max = np.array(YC1s_MDA_sort, dtype='f')
+
+
+    YC1sfig, YC1saxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = []  
+
+    for i in range(N):
+
+        samples = YC1s_sample_arrays[i]
+        x_arraysi = x_arrays[i]
+
+        x_tick_adjust = 0
+        width = 0
+
+        YC1s_MDAS_error_1s = list(zip(YC1s_MDAs_sorted_arrays[i],YC1s_error_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z, a) in enumerate(YC1s_MDAS_error_1s): 
+            YC1s_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
+
+        for l, m, n, o in YC1s_MDAS_error_1s:
+            YC1s_age_values = l 
+            YC1s_error1s_values = m
+            YC1s_age_plus_err = l+m
+            YC1s_error2s_values = m*2
+            x_tick = n
+            samples = o
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            YC1saxi.broken_barh([(x_tick, width)], (YC1s_age_values-YC1s_error2s_values, YC1s_error1s_values), facecolors=('lightsteelblue'))
+            YC1saxi.broken_barh([(x_tick, width)], (YC1s_age_values-YC1s_error1s_values,YC1s_error1s_values), facecolors=('cornflowerblue'))
+            YC1saxi.broken_barh([(x_tick, width)], (YC1s_age_values, YC1s_error1s_values), facecolors=('cornflowerblue'))
+            YC1saxi.broken_barh([(x_tick, width)], (YC1s_age_values+YC1s_error1s_values, YC1s_error1s_values), facecolors=('lightsteelblue'))   
+            YC1saxi.hlines(y=YC1s_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+
+    for i in range(N):
+        YC1saxi.set_xticks(x_arrays)
+        YC1saxi.set_xticklabels(YC1s_sample_sort, rotation='vertical') 
+
+    YC1saxi.hlines(y=YC1s_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YC1s')
+    YC1saxi.broken_barh([(0.15, 0)], (YC1s_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    YC1saxi.broken_barh([(0.15, 0)], (YC1s_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+    YC1saxi.yaxis.grid(True)
+
+    YC1saxi.set_yticks(np.arange(round(YC1s_Y_Max[-1]-10),round(YC1s_sorted[0][0]+10), 2))
+
+
+    plt.gca().invert_yaxis()
+    YC1saxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
+    YC1saxi.set_xlabel('Samples', labelpad=25)
+
+    YC1saxi.set_title('YC1$\sigma$ MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+    if Image_File_Option == 'pdf':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        YC1sfig.savefig('Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.tif')
+
+
+
+    return 
+
+def YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option):
+
+    #Sample_List
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+
+    YC2sfig, YC2saxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = []  
+
+    YC2s_array = np.array(YC2s_MDA)
+    YC2s_MDAs = YC2s_array[:,0]
+    YC2s_error1s = YC2s_array[:,1]
+    YC2s_MDAs_arrays = np.split(YC2s_MDAs,len(YC2s_MDAs))
+    YC2s_error1s_arrays = np.split(YC2s_error1s,len(YC2s_MDAs))
+
+    YC2s_sorted = []
+
+    for i in range(N):
+        YC2s_Zipped = list(zip(YC2s_MDAs_arrays[i],YC2s_error1s_arrays[i],sample_arrays[i]))
+        YC2s_Zipped.sort(key=lambda d: d[0])
+        YC2s_sorted.append([YC2s_Zipped[0][0],YC2s_Zipped[0][1],YC2s_Zipped[0][2]])
+        YC2s_sorted.sort(reverse=True)
+
+    YC2s_sorted_array = np.array(YC2s_sorted)
+    YC2s_MDA_sort = YC2s_sorted_array[:,0]        
+    YC2s_error_sort = YC2s_sorted_array[:,1]
+    YC2s_sample_sort = YC2s_sorted_array[:,2]
+    YC2s_MDAs_sorted_arrays = np.split(YC2s_MDA_sort,len(YC2s_MDA_sort))
+    YC2s_error_sorted_arrays = np.split(YC2s_error_sort,len(YC2s_MDA_sort))
+    YC2s_sample_arrays = np.split(YC2s_sample_sort,len(YC2s_MDA_sort))
+    YC2s_Y_Max = np.array(YC2s_MDA_sort, dtype='f')
+
+
+    for i in range(N):
+
+        samples = YC2s_sample_arrays[i]
+        x_arraysi = x_arrays[i]
+
+        x_tick_adjust = 0
+        width = 0
+
+        YC2s_MDAS_error_1s = list(zip(YC2s_MDAs_sorted_arrays[i],YC2s_error_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z, a) in enumerate(YC2s_MDAS_error_1s): 
+            YC2s_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
+
+        for l, m, n, o in YC2s_MDAS_error_1s:
+            YC2s_age_values = l 
+            YC2s_error1s_values = m
+            YC2s_age_plus_err = l+m
+            YC2s_error2s_values = m*2
+            x_tick = n
+            samples = o
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            YC2saxi.broken_barh([(x_tick, width)], (YC2s_age_values-YC2s_error2s_values, YC2s_error1s_values), facecolors=('lightsteelblue'))
+            YC2saxi.broken_barh([(x_tick, width)], (YC2s_age_values-YC2s_error1s_values,YC2s_error1s_values), facecolors=('cornflowerblue'))
+            YC2saxi.broken_barh([(x_tick, width)], (YC2s_age_values, YC2s_error1s_values), facecolors=('cornflowerblue'))
+            YC2saxi.broken_barh([(x_tick, width)], (YC2s_age_values+YC2s_error1s_values, YC2s_error1s_values), facecolors=('lightsteelblue'))   
+            YC2saxi.hlines(y=YC2s_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+
+    for i in range(N):
+        YC2saxi.set_xticks(x_arrays)
+        YC2saxi.set_xticklabels(YC2s_sample_sort, rotation='vertical') 
+
+    YC2saxi.hlines(y=YC2s_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YC2$\sigma$')
+    YC2saxi.broken_barh([(0.15, 0)], (YC2s_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    YC2saxi.broken_barh([(0.15, 0)], (YC2s_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+
+    YC2saxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
+    YC2saxi.yaxis.grid(True)  
+
+    YC2saxi.set_yticks(np.arange(round(YC2s_Y_Max[-1]-10),round(YC2s_sorted[0][0]+10), 2))
+
+    plt.gca().invert_yaxis()
+    YC2saxi.set_xlabel('Samples', labelpad=25)
+
+    YC2saxi.set_title('YC2$\sigma$ MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+
+    if Image_File_Option == 'pdf':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        YC2sfig.savefig('Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.tif')
+
+
+    return 
+    #Y3Zo
+def Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option):
+
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+    #Y3Zo
+    Y3Zo_array = np.array(Y3Zo_MDA)
+    Y3Zo_MDAs = Y3Zo_array[:,0]
+    Y3Zo_error1s = Y3Zo_array[:,1]
+    Y3Zo_MDAs_arrays = np.split(Y3Zo_MDAs,len(Y3Zo_MDAs))
+    Y3Zo_error1s_arrays = np.split(Y3Zo_error1s,len(Y3Zo_MDAs))
+
+    Y3Zo_sorted = []
+
+    for i in range(N):
+        Y3Zo_Zipped = list(zip(Y3Zo_MDAs_arrays[i],Y3Zo_error1s_arrays[i],sample_arrays[i]))
+        Y3Zo_Zipped.sort(key=lambda d: d[0])
+        Y3Zo_sorted.append([Y3Zo_Zipped[0][0],Y3Zo_Zipped[0][1],Y3Zo_Zipped[0][2]])
+        Y3Zo_sorted.sort(reverse=True)
+
+    Y3Zo_sorted_array = np.array(Y3Zo_sorted)
+    Y3Zo_MDA_sort = Y3Zo_sorted_array[:,0]        
+    Y3Zo_error_sort = Y3Zo_sorted_array[:,1]
+    Y3Zo_sample_sort = Y3Zo_sorted_array[:,2]
+    Y3Zo_MDAs_sorted_arrays = np.split(Y3Zo_MDA_sort,len(Y3Zo_MDA_sort))
+    Y3Zo_error_sorted_arrays = np.split(Y3Zo_error_sort,len(Y3Zo_MDA_sort))
+    Y3Zo_sample_arrays = np.split(Y3Zo_sample_sort,len(Y3Zo_MDA_sort))
+    Y3Zo_Y_Max = np.array(Y3Zo_MDA_sort, dtype='f')
+
+    Y3Zofig, Y3Zoaxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = []  
+
+    for i in range(N):
+
+        samples = Y3Zo_sample_arrays[i]
+        x_arraysi = x_arrays[i]  
+
+        x_tick_adjust = 0
+        width = 0
+
+        Y3Zo_MDAS_error_1s = list(zip(Y3Zo_MDAs_sorted_arrays[i],Y3Zo_error_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z, a) in enumerate(Y3Zo_MDAS_error_1s): 
+            Y3Zo_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
+
+        for l, m, n, o in Y3Zo_MDAS_error_1s:
+            Y3Zo_age_values = l 
+            Y3Zo_error1s_values = m
+            Y3Zo_age_plus_err = l+m
+            Y3Zo_error2s_values = m*2
+            x_tick = n
+            samples = o
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            Y3Zoaxi.broken_barh([(x_tick, width)], (Y3Zo_age_values-Y3Zo_error2s_values, Y3Zo_error1s_values), facecolors=('lightsteelblue'))
+            Y3Zoaxi.broken_barh([(x_tick, width)], (Y3Zo_age_values-Y3Zo_error1s_values,Y3Zo_error1s_values), facecolors=('cornflowerblue'))
+            Y3Zoaxi.broken_barh([(x_tick, width)], (Y3Zo_age_values, Y3Zo_error1s_values), facecolors=('cornflowerblue'))
+            Y3Zoaxi.broken_barh([(x_tick, width)], (Y3Zo_age_values+Y3Zo_error1s_values, Y3Zo_error1s_values), facecolors=('lightsteelblue'))   
+            Y3Zoaxi.hlines(y=Y3Zo_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+
+    for i in range(N):
+        Y3Zoaxi.set_xticks(x_arrays)
+        Y3Zoaxi.set_xticklabels(Y3Zo_sample_sort, rotation='vertical') 
+
+    Y3Zoaxi.hlines(y=Y3Zo_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Y3Zo')
+    Y3Zoaxi.broken_barh([(0.15, 0)], (Y3Zo_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    Y3Zoaxi.broken_barh([(0.15, 0)], (Y3Zo_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+    Y3Zoaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
+    Y3Zoaxi.yaxis.grid(True)  
+
+    Y3Zoaxi.set_yticks(np.arange(round(Y3Zo_Y_Max[-1]-20),round(Y3Zo_sorted[0][0]+20), 5))
+
+    plt.gca().invert_yaxis()
+    Y3Zoaxi.set_xlabel('Samples', labelpad=25)
+
+    Y3Zoaxi.set_title('Y3Zo MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+    if Image_File_Option == 'pdf':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        Y3Zofig.savefig('Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.tif')
+
+
+
+    return 
+
+def Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option):
+
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+    #Tau
+    Tau_array = np.array(Tau_MDA)
+    Tau_MDAs = Tau_array[:,0]
+    Tau_error1s = Tau_array[:,1]
+    Tau_MDAs_arrays = np.split(Tau_MDAs,len(Tau_MDAs))
+    Tau_error1s_arrays = np.split(Tau_error1s,len(Tau_MDAs))
+
+    Tau_sorted = []
+
+    for i in range(N):
+        Tau_Zipped = list(zip(Tau_MDAs_arrays[i],Tau_error1s_arrays[i],sample_arrays[i]))
+        Tau_Zipped.sort(key=lambda d: d[0])
+        Tau_sorted.append([Tau_Zipped[0][0],Tau_Zipped[0][1],Tau_Zipped[0][2]])
+        Tau_sorted.sort(reverse=True)
+
+    Tau_sorted_array = np.array(Tau_sorted)
+    Tau_MDA_sort = Tau_sorted_array[:,0]        
+    Tau_error_sort = Tau_sorted_array[:,1]
+    Tau_sample_sort = Tau_sorted_array[:,2]
+    Tau_MDAs_sorted_arrays = np.split(Tau_MDA_sort,len(Tau_MDA_sort))
+    Tau_error_sorted_arrays = np.split(Tau_error_sort,len(Tau_MDA_sort))
+    Tau_sample_arrays = np.split(Tau_sample_sort,len(Tau_MDA_sort))
+    Tau_Y_Max = np.array(Tau_MDA_sort, dtype='f')
+
+    Taufig, Tauaxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = []  
+
+    for i in range(N):
+
+        samples = Tau_sample_arrays[i]
+        x_arraysi = x_arrays[i]  
+
+        x_tick_adjust = 0
+        width = 0
+
+        Tau_MDAS_error_1s = list(zip(Tau_MDAs_sorted_arrays[i],Tau_error_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z, a) in enumerate(Tau_MDAS_error_1s): 
+            Tau_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
+
+        for l, m, n, o in Tau_MDAS_error_1s:
+            Tau_age_values = l 
+            Tau_error1s_values = m
+            Tau_age_plus_err = l+m
+            Tau_error2s_values = m*2
+            x_tick = n
+            samples = o
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            Tauaxi.broken_barh([(x_tick, width)], (Tau_age_values-Tau_error2s_values, Tau_error1s_values), facecolors=('lightsteelblue'))
+            Tauaxi.broken_barh([(x_tick, width)], (Tau_age_values-Tau_error1s_values,Tau_error1s_values), facecolors=('cornflowerblue'))
+            Tauaxi.broken_barh([(x_tick, width)], (Tau_age_values, Tau_error1s_values), facecolors=('cornflowerblue'))
+            Tauaxi.broken_barh([(x_tick, width)], (Tau_age_values+Tau_error1s_values, Tau_error1s_values), facecolors=('lightsteelblue'))   
+            Tauaxi.hlines(y=Tau_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+
+    for i in range(N):
+        Tauaxi.set_xticks(x_arrays)
+        Tauaxi.set_xticklabels(Tau_sample_sort, rotation='vertical') 
+
+    Tauaxi.hlines(y=Tau_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Tau')
+    Tauaxi.broken_barh([(0.15, 0)], (Tau_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    Tauaxi.broken_barh([(0.15, 0)], (Tau_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+    Tauaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
+    Tauaxi.yaxis.grid(True)  
+
+    Tauaxi.set_yticks(np.arange(round(Tau_Y_Max[-1]-10),round(Tau_sorted[0][0]+10), 2))
+
+
+    plt.gca().invert_yaxis()
+    Tauaxi.set_xlabel('Samples', labelpad=25)
+
+    Tauaxi.set_title('Tau MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+    if Image_File_Option == 'pdf':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        Taufig.savefig('Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.tif')
+
+
+
+    return 
+
+def Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option):
+
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+    #Y3Za
+    Y3Za_array = np.array(Y3Za_MDA)
+    Y3Za_MDAs = Y3Za_array[:,0]
+    Y3Za_error1s = Y3Za_array[:,1]
+    Y3Za_MDAs_arrays = np.split(Y3Za_MDAs,len(Y3Za_MDAs))
+    Y3Za_error1s_arrays = np.split(Y3Za_error1s,len(Y3Za_MDAs))
+
+    Y3Za_sorted = []
+
+    for i in range(N):
+        Y3Za_Zipped = list(zip(Y3Za_MDAs_arrays[i],Y3Za_error1s_arrays[i],sample_arrays[i]))
+        Y3Za_Zipped.sort(key=lambda d: d[0])
+        Y3Za_sorted.append([Y3Za_Zipped[0][0],Y3Za_Zipped[0][1],Y3Za_Zipped[0][2]])
+        Y3Za_sorted.sort(reverse=True)
+
+    Y3Za_sorted_array = np.array(Y3Za_sorted)
+    Y3Za_MDA_sort = Y3Za_sorted_array[:,0]        
+    Y3Za_error_sort = Y3Za_sorted_array[:,1]
+    Y3Za_sample_sort = Y3Za_sorted_array[:,2]
+    Y3Za_MDAs_sorted_arrays = np.split(Y3Za_MDA_sort,len(Y3Za_MDA_sort))
+    Y3Za_error_sorted_arrays = np.split(Y3Za_error_sort,len(Y3Za_MDA_sort))
+    Y3Za_sample_arrays = np.split(Y3Za_sample_sort,len(Y3Za_MDA_sort))
+    Y3Za_Y_Max = np.array(Y3Za_MDA_sort, dtype='f')
+
+    Y3Zafig, Y3Zaaxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = []  
+
+    for i in range(N):
+
+        samples = Y3Za_sample_arrays[i]
+        x_arraysi = x_arrays[i]  
+
+        x_tick_adjust = 0
+        width = 0
+
+        Y3Za_MDAS_error_1s = list(zip(Y3Za_MDAs_sorted_arrays[i],Y3Za_error_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z, a) in enumerate(Y3Za_MDAS_error_1s): 
+            Y3Za_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
+
+        for l, m, n, o in Y3Za_MDAS_error_1s:
+            Y3Za_age_values = l 
+            Y3Za_error1s_values = m
+            Y3Za_age_plus_err = l+m
+            Y3Za_error2s_values = m*2
+            x_tick = n
+            samples = o
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            Y3Zaaxi.broken_barh([(x_tick, width)], (Y3Za_age_values-Y3Za_error2s_values, Y3Za_error1s_values), facecolors=('lightsteelblue'))
+            Y3Zaaxi.broken_barh([(x_tick, width)], (Y3Za_age_values-Y3Za_error1s_values,Y3Za_error1s_values), facecolors=('cornflowerblue'))
+            Y3Zaaxi.broken_barh([(x_tick, width)], (Y3Za_age_values, Y3Za_error1s_values), facecolors=('cornflowerblue'))
+            Y3Zaaxi.broken_barh([(x_tick, width)], (Y3Za_age_values+Y3Za_error1s_values, Y3Za_error1s_values), facecolors=('lightsteelblue'))   
+            Y3Zaaxi.hlines(y=Y3Za_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+
+    for i in range(N):
+        Y3Zaaxi.set_xticks(x_arrays)
+        Y3Zaaxi.set_xticklabels(Y3Za_sample_sort, rotation='vertical') 
+
+    Y3Zaaxi.hlines(y=Y3Za_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Y3Za')
+    Y3Zaaxi.broken_barh([(0.15, 0)], (Y3Za_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    Y3Zaaxi.broken_barh([(0.15, 0)], (Y3Za_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+    Y3Zaaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
+    Y3Zaaxi.yaxis.grid(True)  
+
+    Y3Zaaxi.set_yticks(np.arange(round(Y3Za_Y_Max[-1]-20),round(Y3Za_sorted[0][0]+20), 5))
+
+    plt.gca().invert_yaxis()
+    Y3Zaaxi.set_xlabel('Samples', labelpad=25)
+
+    Y3Zaaxi.set_title('Y3Za MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+    if Image_File_Option == 'pdf':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        Y3Zafig.savefig('Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.tif')
+
+
+
+    return 
+#YSP
+def YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option):
+
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+    YSP_array = np.array(YSP_MDA)
+    YSP_MDAs = YSP_array[:,0]
+    YSP_error1s = YSP_array[:,1]
+    YSP_MDAs_arrays = np.split(YSP_MDAs,len(YSP_MDAs))
+    YSP_error1s_arrays = np.split(YSP_error1s,len(YSP_MDAs))
+
+    YSP_sorted = []
+
+    for i in range(N):
+        YSP_Zipped = list(zip(YSP_MDAs_arrays[i],YSP_error1s_arrays[i],sample_arrays[i]))
+        YSP_Zipped.sort(key=lambda d: d[0])
+        YSP_sorted.append([YSP_Zipped[0][0],YSP_Zipped[0][1],YSP_Zipped[0][2]])
+        YSP_sorted.sort(reverse=True)
+
+    YSP_sorted_array = np.array(YSP_sorted)
+    YSP_MDA_sort = YSP_sorted_array[:,0]        
+    YSP_error_sort = YSP_sorted_array[:,1]
+    YSP_sample_sort = YSP_sorted_array[:,2]
+    YSP_MDAs_sorted_arrays = np.split(YSP_MDA_sort,len(YSP_MDA_sort))
+    YSP_error_sorted_arrays = np.split(YSP_error_sort,len(YSP_MDA_sort))
+    YSP_sample_arrays = np.split(YSP_sample_sort,len(YSP_MDA_sort))
+    YSP_Y_Max = np.array(YSP_MDA_sort, dtype='f')
+
+
+    YSPfig, YSPaxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = []  
+
+    for i in range(N):
+
+        samples = YSP_sample_arrays[i]
+        x_arraysi = x_arrays[i]  
+
+        x_tick_adjust = 0
+        width = 0
+
+        YSP_MDAS_error_1s = list(zip(YSP_MDAs_sorted_arrays[i],YSP_error_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z, a) in enumerate(YSP_MDAS_error_1s): 
+            YSP_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
+
+        for l, m, n, o in YSP_MDAS_error_1s:
+            YSP_age_values = l 
+            YSP_error1s_values = m
+            YSP_age_plus_err = l+m
+            YSP_error2s_values = m*2
+            x_tick = n
+            samples = o
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            YSPaxi.broken_barh([(x_tick, width)], (YSP_age_values-YSP_error2s_values, YSP_error1s_values), facecolors=('lightsteelblue'))
+            YSPaxi.broken_barh([(x_tick, width)], (YSP_age_values-YSP_error1s_values,YSP_error1s_values), facecolors=('cornflowerblue'))
+            YSPaxi.broken_barh([(x_tick, width)], (YSP_age_values, YSP_error1s_values), facecolors=('cornflowerblue'))
+            YSPaxi.broken_barh([(x_tick, width)], (YSP_age_values+YSP_error1s_values, YSP_error1s_values), facecolors=('lightsteelblue'))   
+            YSPaxi.hlines(y=YSP_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+
+    for i in range(N):
+        YSPaxi.set_xticks(x_arrays)
+        YSPaxi.set_xticklabels(YSP_sample_sort, rotation='vertical') 
+
+    YSPaxi.hlines(y=YSP_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YSP')
+    YSPaxi.broken_barh([(0.15, 0)], (YSP_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    YSPaxi.broken_barh([(0.15, 0)], (YSP_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+    YSPaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
+    YSPaxi.yaxis.grid(True)  
+
+    YSPaxi.set_yticks(np.arange(round(YSP_Y_Max[-1]-10),round(YSP_sorted[0][0]+10), 2))
+
+    plt.gca().invert_yaxis()
+    YSPaxi.set_xlabel('Samples', labelpad=25)
+
+    YSPaxi.set_title('YSP MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+    if Image_File_Option == 'pdf':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        YSPfig.savefig('Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.tif')
+
+
+    return 
+#YPP
+def YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option):
+
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+    YPP_array = np.array(YPP_MDA)
+    YPP_MDAs_arrays = np.split(YPP_array,len(YPP_array))
+
+    YPP_sorted = []
+
+    for i in range(N):
+        YPP_Zipped = list(zip(YPP_MDAs_arrays[i],sample_arrays[i]))
+        YPP_Zipped.sort(key=lambda d: d[0])
+        YPP_sorted.append([YPP_Zipped[0][0],YPP_Zipped[0][1]])
+        YPP_sorted.sort(reverse=True)
+
+    YPP_sorted_array = np.array(YPP_sorted)
+    YPP_MDA_sort = YPP_sorted_array[:,0]       
+    YPP_sample_sort = YPP_sorted_array[:,1]
+    YPP_MDAs_sorted_arrays = np.split(YPP_MDA_sort,len(YPP_MDA_sort))
+    YPP_sample_arrays = np.split(YPP_sample_sort,len(YPP_MDA_sort))
+    YPP_Y_Max = np.array(YPP_MDA_sort, dtype='f')
+
+
+
+    YPPfig, YPPaxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = []  
+
+    for i in range(N):
+
+        samples = YPP_sample_arrays[i]
+        x_arraysi = x_arrays[i]
+        x_tick_adjust = 0
+
+        YPP_MDAS_error_1s = list(zip(YPP_MDAs_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z) in enumerate(YPP_MDAS_error_1s): 
+            YPP_MDAS_error_1s[idx] = (float(x), float(y), str(z)) 
+
+        for l, m, n in YPP_MDAS_error_1s:
+            YPP_age_values = l 
+            x_tick = m
+            samples = n
+
+            YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0), facecolors=('midnightblue'))
+            YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0.33), facecolors=('midnightblue'))
+            YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0), facecolors=('midnightblue'))
+            YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0), facecolors=('midnightblue'))   
+
+    for i in range(N):
+        YPPaxi.set_xticks(x_arrays)
+        YPPaxi.set_xticklabels(YPP_sample_sort, rotation='vertical') 
+
+    YPPaxi.hlines(y=YPP_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YPP')
+    YPPaxi.broken_barh([(0.15, 0)], (YPP_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    YPPaxi.broken_barh([(0.15, 0)], (YPP_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+    YPPaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
+    YPPaxi.yaxis.grid(True)  
+
+    YPPaxi.set_yticks(np.arange(round(YPP_Y_Max[-1]-10),round(YPP_sorted[0][0]+10), 5))
+
+    plt.gca().invert_yaxis()
+    YPPaxi.set_xlabel('Samples', labelpad=25)
+
+    YPPaxi.set_title('YPP MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+    if Image_File_Option == 'pdf':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        YPPfig.savefig('Saved_Files/Stratigraphic_Plots/YPP_All_Samples_Plot.tif')
+
+
+
+    return 
+
+def MLA_Strat_Plot(MLA_MDA, sample_list, Image_File_Option):
+    N = len(sample_list)
+    sample_array = np.array(sample_list)
+    sample_arrays = np.split(sample_array,len(sample_array))
+
+    #MLA
+    MLA_array = np.array(MLA_MDA)
+    MLA_MDAs = MLA_array[:,0]
+    MLA_error1s = MLA_array[:,1]
+    MLA_MDAs_arrays = np.split(MLA_MDAs,len(MLA_MDAs))
+    MLA_error1s_arrays = np.split(MLA_error1s,len(MLA_MDAs))
+
+    MLA_sorted = []
+
+    for i in range(N):
+        MLA_Zipped = list(zip(MLA_MDAs_arrays[i],MLA_error1s_arrays[i],sample_arrays[i]))
+        MLA_Zipped.sort(key=lambda d: d[0])
+        MLA_sorted.append([MLA_Zipped[0][0],MLA_Zipped[0][1],MLA_Zipped[0][2]])
+        MLA_sorted.sort(reverse=True)
+
+    MLA_sorted_array = np.array(MLA_sorted)
+    MLA_MDA_sort = MLA_sorted_array[:,0]        
+    MLA_error_sort = MLA_sorted_array[:,1]
+    MLA_sample_sort = MLA_sorted_array[:,2]
+    MLA_MDAs_sorted_arrays = np.split(MLA_MDA_sort,len(MLA_MDA_sort))
+    MLA_error_sorted_arrays = np.split(MLA_error_sort,len(MLA_MDA_sort))
+    MLA_sample_arrays = np.split(MLA_sample_sort,len(MLA_MDA_sort))
+    MLA_Y_Max = np.array(MLA_MDA_sort, dtype='f')
+
+
+    #Setting up the x-axis placements
+    for i in range(N): 
+        samplesi = sample_list[i]
+
+        def create_x(t, w, n, d):
+            return [t*x + w*n for x in range(d)]
+
+        t = 1 # sets of data
+        w = 0.3 # We generally want bars to be 0.8
+        n = 1 # first set of data
+        d = len(sample_list) # topics we're plotting
+        plot_x = create_x(t,w,n,d)
+        middle = [ a / 2.0 for a in plot_x]
+        middle_x_array = np.array(middle)
+        x_arrays = np.split(middle_x_array,len(sample_list))
+
+    MLAfig, MLAaxi = plt.subplots(figsize=(plotwidth, plotheight))
+    width = []  
+
+    for i in range(N):
+
+        samples = MLA_sample_arrays[i]
+        x_arraysi = x_arrays[i]  
+
+        x_tick_adjust = 0
+        width = 0
+
+        MLA_MDAS_error_1s = list(zip(MLA_MDAs_sorted_arrays[i],MLA_error_sorted_arrays[i],x_arraysi,samples))
+
+        for idx, (x, y, z, a) in enumerate(MLA_MDAS_error_1s): 
+            MLA_MDAS_error_1s[idx] = (float(x), float(y), float(z), str(a)) 
+
+        for l, m, n, o in MLA_MDAS_error_1s:
+            MLA_age_values = l 
+            MLA_error1s_values = m
+            MLA_age_plus_err = l+m
+            MLA_error2s_values = m*2
+            x_tick = n
+            samples = o
+
+            if N==1:
+                x_tick_adjust = 0.0002
+                width = 0.002
+                x_tick = 0
+                x_arrays = [0]
+
+            if N==2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>2:
+                x_tick_adjust = 0.002
+                width = 0.02
+
+            if N>4:
+                x_tick_adjust = 0.006
+                width = 0.05
+
+            if N>6:
+                x_tick_adjust = 0.006
+                width = 0.07
+
+            if N>8:
+                x_tick_adjust = 0.009
+                width = 0.09
+
+            if N>12:
+                width=0.11
+                x_tick_adjust=0.02
+
+            if N>17:
+                width=0.12
+                x_tick_adjust=0.02
+
+            if N>20:
+                width=0.17
+                x_tick_adjust=0.02
+
+            MLAaxi.broken_barh([(x_tick, width)], (MLA_age_values-MLA_error2s_values, MLA_error1s_values), facecolors=('lightsteelblue'))
+            MLAaxi.broken_barh([(x_tick, width)], (MLA_age_values-MLA_error1s_values,MLA_error1s_values), facecolors=('cornflowerblue'))
+            MLAaxi.broken_barh([(x_tick, width)], (MLA_age_values, MLA_error1s_values), facecolors=('cornflowerblue'))
+            MLAaxi.broken_barh([(x_tick, width)], (MLA_age_values+MLA_error1s_values, MLA_error1s_values), facecolors=('lightsteelblue'))   
+            MLAaxi.hlines(y=MLA_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
+
+    for i in range(N):
+        MLAaxi.set_xticks(x_arrays)
+        MLAaxi.set_xticklabels(MLA_sample_sort, rotation='vertical') 
+
+    MLAaxi.hlines(y=MLA_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: MLA')
+    MLAaxi.broken_barh([(0.15, 0)], (MLA_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
+    MLAaxi.broken_barh([(0.15, 0)], (MLA_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
+
+    MLAaxi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
+    MLAaxi.yaxis.grid(True)  
+
+    MLAaxi.set_yticks(np.arange(round(MLA_Y_Max[-1]-10),round(MLA_sorted[0][0]+10), 2))
+
+    plt.gca().invert_yaxis()
+    MLAaxi.set_xlabel('Samples', labelpad=25)
+
+    MLAaxi.set_title('MLA MDA: All Samples') 
+    plt.legend(loc='upper left')
+
+    if Image_File_Option == 'pdf':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.pdf')
+    if Image_File_Option == 'png':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.png')
+    if Image_File_Option == 'eps':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.eps')
+    if Image_File_Option == 'jpeg':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.jpeg')
+    if Image_File_Option == 'jpg':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.jpg')
+    if Image_File_Option == 'pgf':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.pgf')
+    if Image_File_Option == 'ps':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.ps')
+    if Image_File_Option == 'raw':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.raw')
+    if Image_File_Option == 'rgba':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.rgba')
+    if Image_File_Option == 'svg':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.svg')
+    if Image_File_Option == 'svgz':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.svgz')
+    if Image_File_Option == 'tif':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.tif')
+    if Image_File_Option == 'tiff':
+        MLAfig.savefig('Saved_Files/Stratigraphic_Plots/MLA_All_Samples_Plot.tif')
+
+
+    return 
 
 #Functions for individual MDA method outputs 
 
@@ -3730,7 +3715,7 @@ def MLA_outputs(sample_list, dataToLoad):
     
     Radial_Plots = radial_plots()
     
-    return 
+    return None, MLA_Table
 
 
 def radial_plots():
