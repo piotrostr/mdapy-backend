@@ -924,7 +924,7 @@ def calculate_all_samples_YC1s():
     age_addition_set_max_plot = 30
     Image_File_Option = 'svg'
 
-    mdapy.YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option)
+    mdapy.YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
@@ -955,7 +955,7 @@ def calculate_all_samples_YC2s():
     age_addition_set_max_plot = 30
     Image_File_Option = 'svg'
 
-    mdapy.YC2s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option)
+    mdapy.YC2s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
@@ -981,7 +981,12 @@ def calculate_all_samples_Tau():
     ) = parse_params(data)
     Tau_MDA, Tau_Grains, PDP_age, PDP, plot_max, ages_errors1s_filtered, tauMethod_WM,tauMethod_WM_err2s = mdapy.tau(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off, min_cluster_size=3, thres=0.01, minDist=1, xdif=1, x1=0, x2=4000)
 
-    mdapy.Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option)
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    mdapy.Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
@@ -1008,7 +1013,12 @@ def calculate_all_samples_YSP():
 
     YSP_MDA, YSP_cluster = mdapy.YSP(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off, min_cluster_size=2, MSWD_threshold=1)
 
-    mdapy.YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option)
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    mdapy.YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
@@ -1034,7 +1044,13 @@ def calculate_all_samples_YDZ():
     ) = parse_params(data)
 
     YDZ_MDA, minAges, mode = mdapy.YDZ(ages, errors, iterations=10000, chartOutput = False, bins=25)
-    mdapy.YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option)
+
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    mdapy.YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
@@ -1059,7 +1075,13 @@ def calculate_all_samples_Y3Zo():
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
     Y3Zo_MDA, Y3Zo_cluster_arrays = mdapy.Y3Zo(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off)
-    mdapy.Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option)
+
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+
+    mdapy.Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
@@ -1083,8 +1105,22 @@ def calculate_all_samples_Y3Za():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
-    Y3Za_MDA, Y3Za_cluster_arrays = mdapy.Y3Za(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off)
-    mdapy.Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option)
+    Y3Za_MDA, Y3Za_cluster_arrays = mdapy.Y3Za(
+        ages, errors, sample_list,
+        eight_six_ratios, eight_six_error, seven_six_ratios,
+        seven_six_error, U238_decay_constant, U235_decay_constant,
+        U238_U235, excess_variance_206_238, excess_variance_207_206,
+        Sy_calibration_uncertainty_206_238,
+        Sy_calibration_uncertainty_207_206,
+        decay_constant_uncertainty_U238, decay_constant_uncertainty_U235,
+        Data_Type, best_age_cut_off
+    )
+
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+    mdapy.Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
@@ -1117,7 +1153,11 @@ def calculate_all_samples_YSG():
         decay_constant_uncertainty_U235, Data_Type, best_age_cut_off
     )
 
-    mdapy.YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option)
+    plotwidth = 10
+    plotheight = 7
+    age_addition_set_max_plot = 30
+    Image_File_Option = 'svg'
+    mdapy.YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.svg'
     with open(fname, 'r') as f:

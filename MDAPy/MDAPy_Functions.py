@@ -523,7 +523,7 @@ def MDA_Strat_Plot(YSG_MDA, YC1s_MDA, YC2s_MDA, YDZ_MDA, Y3Zo_MDA, Y3Za_MDA, Tau
         
     return Plot
 
-def YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option):
+def YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     N = len(sample_list)
     sample_array = np.array(sample_list)
@@ -682,7 +682,7 @@ def YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option):
 
     return YSGfig
 #YDZ
-def YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option):
+def YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     #Sample_List
     N = len(sample_list)
@@ -856,7 +856,7 @@ def YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option):
 
     return 
 #YC1s
-def YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option):
+def YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     #Sample_List
     N = len(sample_list)
@@ -1024,7 +1024,7 @@ def YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option):
 
     return 
 
-def YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option):
+def YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     #Sample_List
     N = len(sample_list)
@@ -1192,7 +1192,7 @@ def YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option):
 
     return 
     #Y3Zo
-def Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option):
+def Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     N = len(sample_list)
     sample_array = np.array(sample_list)
@@ -1357,7 +1357,7 @@ def Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option):
 
     return 
 
-def Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option):
+def Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     N = len(sample_list)
     sample_array = np.array(sample_list)
@@ -1523,7 +1523,7 @@ def Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option):
 
     return 
 
-def Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option):
+def Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     N = len(sample_list)
     sample_array = np.array(sample_list)
@@ -1688,7 +1688,7 @@ def Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option):
 
     return 
 #YSP
-def YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option):
+def YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     N = len(sample_list)
     sample_array = np.array(sample_list)
@@ -1852,7 +1852,7 @@ def YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option):
 
     return 
 #YPP
-def YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option):
+def YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
 
     N = len(sample_list)
     sample_array = np.array(sample_list)
@@ -1968,7 +1968,7 @@ def YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option):
 
     return 
 
-def MLA_Strat_Plot(MLA_MDA, sample_list, Image_File_Option):
+def MLA_Strat_Plot(MLA_MDA, sample_list, Image_File_Option, plotwidth, plotheight):
     N = len(sample_list)
     sample_array = np.array(sample_list)
     sample_arrays = np.split(sample_array,len(sample_array))
