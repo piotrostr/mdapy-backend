@@ -452,7 +452,10 @@ def Plot_MDA(MDAs_1s_table, all_MDA_data, sample_list, YSG_MDA, YC1s_MDA, YC2s_M
         axi.set_ylabel('Age'+" " +'(Ma)',labelpad=25)
         axi.set_xlabel('MDA Methods',labelpad=25)
         axi.set_xticks([0,1,2,3,4,5,6,7,8,9,10,11])
-        axi.set_xticklabels(MDA_methods)
+        try:
+            axi.set_xticklabels(MDA_methods)
+        except:
+            pass
         axi.set_title(samples[0])
         axi.yaxis.grid(True)
         plt.margins(0.02)
@@ -492,31 +495,33 @@ def Plot_MDA(MDAs_1s_table, all_MDA_data, sample_list, YSG_MDA, YC1s_MDA, YC2s_M
 #Plot for All samples using one MDA method: Code by morganbrooks 
 
 def MDA_Strat_Plot(YSG_MDA, YC1s_MDA, YC2s_MDA, YDZ_MDA, Y3Zo_MDA, Y3Za_MDA, Tau_MDA, YSP_MDA, YPP_MDA, MLA_MDA, ages, errors, sample_list, Image_File_Option, plotwidth, plotheight, MDA_Method):
+    plotwidth = 12
+    plotheight = 9
 
     if not hasattr(ages[0], '__len__'):
         ages = [ages]
         errors = [errors]
         
     if MDA_Method == "YSG":
-        Plot = YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option)
+        Plot = YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'YC1s':
-        Plot = YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option)
+        Plot = YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'YC2s':
-        Plot = YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option)
+        Plot = YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'YDZ':
-        Plot = YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option)
+        Plot = YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'Y3Zo':
-        Plot = Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option)
+        Plot = Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'Y3Za':
-        Plot = Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option)
+        Plot = Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'Tau':
-        Plot = Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option)
+        Plot = Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'YSP':
-        Plot = YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option)
+        Plot = YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'YPP':
-        Plot = YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option)
+        Plot = YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
     if MDA_Method == 'MLA':
-        Plot = MLA_Strat_Plot(MLA_MDA, sample_list, Image_File_Option)
+        Plot = MLA_Strat_Plot(MLA_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
         
     if MDA_Method == 'All':
         Plot = YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option), YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option), YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option), YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option), Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option), Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option), Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option), YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option), YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option), MLA_Strat_Plot(MLA_MDA, sample_list, Image_File_Option)
@@ -633,8 +638,11 @@ def YSG_Strat_Plot(YSG_MDA, sample_list, Image_File_Option, plotwidth, plotheigh
             YSGaxi.hlines(y=YSG_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
 
     for i in range(N):
-        YSGaxi.set_xticks(x_arrays)
-        #YSGaxi.set_xticklabels(YSG_sample_sort,rotation='vertical') 
+        try:
+            YSGaxi.set_xticks(x_arrays)
+            YSGaxi.set_xticklabels(YSG_sample_sort,rotation='vertical') 
+        except:
+            YSGaxi.set_xticks(x_arrays)
 
     YSGaxi.hlines(y=YSG_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YSG')
     YSGaxi.broken_barh([(0.15, 0)], (YSG_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
@@ -805,8 +813,11 @@ def YDZ_Strat_Plot(YDZ_MDA, sample_list, Image_File_Option, plotwidth, plotheigh
             YDZaxi.hlines(y=YDZ_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
 
     for i in range(N):
-        YDZaxi.set_xticks(x_arrays)
-        YDZaxi.set_xticklabels(YDZ_sample_sort, rotation='vertical')  
+        try:
+            YDZaxi.set_xticks(x_arrays)
+            YDZaxi.set_xticklabels(YDZ_sample_sort, rotation='vertical')  
+        except:
+            YDZaxi.set_xticks(x_arrays)
 
     YDZaxi.hlines(y=YDZ_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YDZ')
     YDZaxi.broken_barh([(0.15, 0)], (YDZ_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
@@ -974,8 +985,11 @@ def YC1s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option, plotwidth, plothei
 
 
     for i in range(N):
-        YC1saxi.set_xticks(x_arrays)
-        YC1saxi.set_xticklabels(YC1s_sample_sort, rotation='vertical') 
+        try: 
+            YC1saxi.set_xticks(x_arrays)
+            YC1saxi.set_xticklabels(YC1s_sample_sort, rotation='vertical') 
+        except:
+            YC1saxi.set_xticks(x_arrays)
 
     YC1saxi.hlines(y=YC1s_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YC1s')
     YC1saxi.broken_barh([(0.15, 0)], (YC1s_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
@@ -1142,8 +1156,11 @@ def YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option, plotwidth, plothei
 
 
     for i in range(N):
-        YC2saxi.set_xticks(x_arrays)
-        YC2saxi.set_xticklabels(YC2s_sample_sort, rotation='vertical') 
+        try:
+            YC2saxi.set_xticks(x_arrays)
+            YC2saxi.set_xticklabels(YC2s_sample_sort, rotation='vertical') 
+        except:
+            YC2saxi.set_xticks(x_arrays)
 
     YC2saxi.hlines(y=YC2s_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YC2$\sigma$')
     YC2saxi.broken_barh([(0.15, 0)], (YC2s_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
@@ -1308,8 +1325,11 @@ def Y3Zo_Strat_Plot(Y3Zo_MDA, sample_list, Image_File_Option, plotwidth, plothei
 
 
     for i in range(N):
-        Y3Zoaxi.set_xticks(x_arrays)
-        Y3Zoaxi.set_xticklabels(Y3Zo_sample_sort, rotation='vertical') 
+        try:
+            Y3Zoaxi.set_xticks(x_arrays)
+            Y3Zoaxi.set_xticklabels(Y3Zo_sample_sort, rotation='vertical') 
+        except:
+            Y3Zoaxi.set_xticks(x_arrays)
 
     Y3Zoaxi.hlines(y=Y3Zo_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Y3Zo')
     Y3Zoaxi.broken_barh([(0.15, 0)], (Y3Zo_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
@@ -1473,9 +1493,12 @@ def Tau_Strat_Plot(Tau_MDA, sample_list, Image_File_Option, plotwidth, plotheigh
 
 
     for i in range(N):
-        Tauaxi.set_xticks(x_arrays)
-        Tauaxi.set_xticklabels(Tau_sample_sort, rotation='vertical') 
-
+        try:
+            Tauaxi.set_xticks(x_arrays)
+            Tauaxi.set_xticklabels(Tau_sample_sort, rotation='vertical') 
+        except:
+            Tauaxi.set_xticks(x_arrays)
+            
     Tauaxi.hlines(y=Tau_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Tau')
     Tauaxi.broken_barh([(0.15, 0)], (Tau_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
     Tauaxi.broken_barh([(0.15, 0)], (Tau_age_values,0), facecolors=('lightsteelblue'), label='2$\sigma$ Error')
@@ -1639,8 +1662,11 @@ def Y3Za_Strat_Plot(Y3Za_MDA, sample_list, Image_File_Option, plotwidth, plothei
 
 
     for i in range(N):
-        Y3Zaaxi.set_xticks(x_arrays)
-        Y3Zaaxi.set_xticklabels(Y3Za_sample_sort, rotation='vertical') 
+        try:
+            Y3Zaaxi.set_xticks(x_arrays)
+            Y3Zaaxi.set_xticklabels(Y3Za_sample_sort, rotation='vertical') 
+        except:
+            Y3Zaaxi.set_xticks(x_arrays)
 
     Y3Zaaxi.hlines(y=Y3Za_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: Y3Za')
     Y3Zaaxi.broken_barh([(0.15, 0)], (Y3Za_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
@@ -1804,8 +1830,11 @@ def YSP_Strat_Plot(YSP_MDA, sample_list, Image_File_Option, plotwidth, plotheigh
 
 
     for i in range(N):
-        YSPaxi.set_xticks(x_arrays)
-        YSPaxi.set_xticklabels(YSP_sample_sort, rotation='vertical') 
+        try:
+            YSPaxi.set_xticks(x_arrays)
+            YSPaxi.set_xticklabels(YSP_sample_sort, rotation='vertical') 
+        except:
+            YSPaxi.set_xticks(x_arrays)
 
     YSPaxi.hlines(y=YSP_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YSP')
     YSPaxi.broken_barh([(0.15, 0)], (YSP_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
@@ -1919,8 +1948,11 @@ def YPP_Strat_Plot(YPP_MDA, sample_list, Image_File_Option, plotwidth, plotheigh
             YPPaxi.broken_barh([(x_tick, 0.1)], (YPP_age_values, 0), facecolors=('midnightblue'))   
 
     for i in range(N):
-        YPPaxi.set_xticks(x_arrays)
-        YPPaxi.set_xticklabels(YPP_sample_sort, rotation='vertical') 
+        try:
+            YPPaxi.set_xticks(x_arrays)
+            YPPaxi.set_xticklabels(YPP_sample_sort, rotation='vertical') 
+        except:
+            YPPaxi.set_xticks(x_arrays)
 
     YPPaxi.hlines(y=YPP_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: YPP')
     YPPaxi.broken_barh([(0.15, 0)], (YPP_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
@@ -2083,8 +2115,11 @@ def MLA_Strat_Plot(MLA_MDA, sample_list, Image_File_Option, plotwidth, plotheigh
             MLAaxi.hlines(y=MLA_age_values, xmin=x_tick, xmax=(x_tick+(width-x_tick_adjust)), color = 'midnightblue', lw=1,linewidth=3)
 
     for i in range(N):
-        MLAaxi.set_xticks(x_arrays)
-        MLAaxi.set_xticklabels(MLA_sample_sort, rotation='vertical') 
+        try:
+            MLAaxi.set_xticks(x_arrays)
+            MLAaxi.set_xticklabels(MLA_sample_sort, rotation='vertical') 
+        except:
+            MLAaxi.set_xticks(x_arrays)
 
     MLAaxi.hlines(y=MLA_age_values, xmin=0, xmax=(0), color = 'midnightblue', lw=1, linewidth=3, label='MDA: MLA')
     MLAaxi.broken_barh([(0.15, 0)], (MLA_age_values,0), facecolors=('cornflowerblue'), label='1$\sigma$ Error')
