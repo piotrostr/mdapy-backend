@@ -948,19 +948,45 @@ def calculate_all_samples_YC2s():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
-    YC2s_MDA,YC2s_cluster_arrays = YC2s(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off, min_cluster_size=3)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
+    YC2s_MDA,YC2s_cluster_arrays = mdapy.YC2s(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off, min_cluster_size=3)
 
     plotwidth = 10
     plotheight = 7
     age_addition_set_max_plot = 30
     Image_File_Option = 'svg'
 
-    mdapy.YC2s_Strat_Plot(YC1s_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
+    mdapy.YC2s_Strat_Plot(YC2s_MDA, sample_list, Image_File_Option, plotwidth, plotheight)
 
     fname = 'Saved_Files/Stratigraphic_Plots/YC2s_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps(svg))
+    response = make_response(json.dumps([json.dumps(svg)]))
     return sign(response)
 
 
@@ -979,6 +1005,32 @@ def calculate_all_samples_Tau():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
     Tau_MDA, Tau_Grains, PDP_age, PDP, plot_max, ages_errors1s_filtered, tauMethod_WM,tauMethod_WM_err2s = mdapy.tau(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off, min_cluster_size=3, thres=0.01, minDist=1, xdif=1, x1=0, x2=4000)
 
     plotwidth = 10
@@ -991,7 +1043,7 @@ def calculate_all_samples_Tau():
     fname = 'Saved_Files/Stratigraphic_Plots/Tau_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps(svg))
+    response = make_response(json.dumps([json.dumps(svg)]))
     return sign(response)
 
 
@@ -1010,6 +1062,32 @@ def calculate_all_samples_YSP():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
 
     YSP_MDA, YSP_cluster = mdapy.YSP(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off, min_cluster_size=2, MSWD_threshold=1)
 
@@ -1023,7 +1101,7 @@ def calculate_all_samples_YSP():
     fname = 'Saved_Files/Stratigraphic_Plots/YSP_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps(svg))
+    response = make_response(json.dumps([json.dumps(svg)]))
     return sign(response)
 
 
@@ -1042,6 +1120,32 @@ def calculate_all_samples_YDZ():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
 
     YDZ_MDA, minAges, mode = mdapy.YDZ(ages, errors, iterations=10000, chartOutput = False, bins=25)
 
@@ -1055,7 +1159,7 @@ def calculate_all_samples_YDZ():
     fname = 'Saved_Files/Stratigraphic_Plots/YDZ_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps(svg))
+    response = make_response(json.dumps([json.dumps(svg)]))
     return sign(response)
 
 
@@ -1074,6 +1178,32 @@ def calculate_all_samples_Y3Zo():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
     Y3Zo_MDA, Y3Zo_cluster_arrays = mdapy.Y3Zo(ages, errors, sample_list, eight_six_ratios, eight_six_error, seven_six_ratios, seven_six_error, U238_decay_constant, U235_decay_constant, U238_U235, excess_variance_206_238, excess_variance_207_206, Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, decay_constant_uncertainty_U238, decay_constant_uncertainty_U235, Data_Type, best_age_cut_off)
 
     plotwidth = 10
@@ -1086,7 +1216,7 @@ def calculate_all_samples_Y3Zo():
     fname = 'Saved_Files/Stratigraphic_Plots/Y3Zo_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps(svg))
+    response = make_response(json.dumps([json.dumps(svg)]))
     return sign(response)
 
 
@@ -1105,6 +1235,32 @@ def calculate_all_samples_Y3Za():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
     Y3Za_MDA, Y3Za_cluster_arrays = mdapy.Y3Za(
         ages, errors, sample_list,
         eight_six_ratios, eight_six_error, seven_six_ratios,
@@ -1125,7 +1281,7 @@ def calculate_all_samples_Y3Za():
     fname = 'Saved_Files/Stratigraphic_Plots/Y3Za_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps(svg))
+    response = make_response(json.dumps([json.dumps(svg)]))
     return sign(response)
 
 
@@ -1144,6 +1300,32 @@ def calculate_all_samples_YSG():
         Sy_calibration_uncertainty_206_238, Sy_calibration_uncertainty_207_206, 
         decay_constant_uncertainty_U238, decay_constant_uncertainty_U235
     ) = parse_params(data)
+    ( 
+	ages, errors, eight_six_ratios, eight_six_error,
+        seven_six_ratios, seven_six_error, numGrains, labels,
+	sample_list, best_age_cut_off, dataToLoad_MLA,
+	U238_decay_constant,U235_decay_constant,U238_U235,
+	excess_variance_206_238, excess_variance_207_206, 
+	Sy_calibration_uncertainty_206_238, 
+	Sy_calibration_uncertainty_207_206, 
+	decay_constant_uncertainty_U238,
+	decay_constant_uncertainty_U235
+    ) = mdapy.sampleToData(
+	sample_list,
+	main_byid_df, 
+	sigma,
+	Data_Type,
+	uncertainty,
+        best_age_cut_off,
+	U238_decay_constant,
+	U235_decay_constant,
+	U238_U235,excess_variance_206_238,
+	excess_variance_207_206,
+	Sy_calibration_uncertainty_206_238,
+	Sy_calibration_uncertainty_207_206,
+	decay_constant_uncertainty_U238, 
+	decay_constant_uncertainty_U235
+    )
 
     YSG_MDA = mdapy.YSG(
         ages, errors, sample_list, excess_variance_206_238,
@@ -1162,6 +1344,6 @@ def calculate_all_samples_YSG():
     fname = 'Saved_Files/Stratigraphic_Plots/YSG_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps(svg))
+    response = make_response(json.dumps([json.dumps(svg)]))
     return sign(response)
 
