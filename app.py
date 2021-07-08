@@ -929,7 +929,7 @@ def calculate_all_samples_YC1s():
     fname = 'Saved_Files/Stratigraphic_Plots/YC1s_All_Samples_Plot.svg'
     with open(fname, 'r') as f:
         svg = f.read()
-    response = make_response(json.dumps(svg))
+    response = make_response(json.dumps([json.dumps(svg)]))
     return sign(response)
 
 
