@@ -13,7 +13,8 @@ def parse_params(data):
         Data_Type = 'Ages'
     elif data['dataset'] == 'U-Pb 238/206 & Pb-Pb 207/206':
         Data_Type = '238U/206Pb_&_207Pb/206Pb'
-    sample_list = ['UK027', 'UK025']  # where to get this from? TODO
+    sample_list = data['samplesToPlot']  # where to get this from? TODO
+    sample_list.remove('All Samples')
     if data['sigma'] == '1 sx':
         sigma = 1
     elif data['sigma'] == '2 sx':
@@ -93,6 +94,7 @@ def check_validity():
         response = make_response(jsonify(msg))
         return sign(response)
     data = json.loads(request.data)
+    print(data)
     dataset = data['dataset']
     if dataset == 'Best Age and sx':
         data_type = 'Ages'
