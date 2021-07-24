@@ -2,6 +2,13 @@ import pandas as pd
 import numpy as np
 
 
+def parse_float(item):
+    try:
+        return float(item)
+    except:
+        return item
+
+
 def load_data(arrays, column_names, data_type):
     dataSheet = 'Data'
     ID_col = 'Sample_ID'

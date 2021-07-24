@@ -13,8 +13,10 @@ def parse_params(data):
         Data_Type = 'Ages'
     elif data['dataset'] == 'U-Pb 238/206 & Pb-Pb 207/206':
         Data_Type = '238U/206Pb_&_207Pb/206Pb'
-    sample_list = data['samplesToPlot']  # where to get this from? TODO
-    sample_list.remove('All Samples')
+    sample_list = data['samplesToPlot']
+    if 'All Samples' in sample_list:
+        main_df, *_ = parse_dfs(data)
+        sample_list = main_df['Sample_ID'].tolist()
     if data['sigma'] == '1 sx':
         sigma = 1
     elif data['sigma'] == '2 sx':
@@ -45,9 +47,12 @@ def parse_params(data):
 
 
 def parse_float(x):
-    if ',' in x:
-        return float(x.replace(',', '.'))
-    return x
+    try:
+        if ',' in x:
+            return float(x.replace(',', '.'))
+        return float(x)
+    except:
+        return x
 
 
 def parse_dfs(data):
@@ -94,7 +99,6 @@ def check_validity():
         response = make_response(jsonify(msg))
         return sign(response)
     data = json.loads(request.data)
-    print(data)
     dataset = data['dataset']
     if dataset == 'Best Age and sx':
         data_type = 'Ages'
