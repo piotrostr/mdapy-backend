@@ -4045,8 +4045,10 @@ def sampleToData(sample_list, main_byid_df, sigma, Data_Type, uncertainty, best_
     def sampleToData_ages(sample_list, main_byid_df, sigma, uncertainty, best_age_cut_off, sampleLabel='Sample_ID', bestAge='Best_Age', bestAgeErr='Best_Age_sx'):
 
         N = len(sample_list)
+        print(sample_list)
         sample_array = np.array(sample_list)
         sample_arrays = np.split(sample_array,len(sample_array))
+        ages = []
         
         
         if type(sample_list[0])==tuple:
@@ -4097,10 +4099,14 @@ def sampleToData(sample_list, main_byid_df, sigma, Data_Type, uncertainty, best_
                     errors_no_conversion.append(main_byid_df.loc[sample, bestAgeErr]/2./100.)
 
                 elif uncertainty == 'percent':
-                    errors_no_conversion.append(main_byid_df.loc[sample, bestAgeErr]/100.)
+                    dat = main_byid_df.loc[sample, bestAgeErr]
+                    dat = np.array(list(map(float, dat)))
+                    errors_no_conversion.append(dat / 100.)
                     
                 elif sigma == 2:
-                    errors.append(main_byid_df.loc[sample, bestAgeErr]/2.)
+                    dat = main_byid_df.loc[sample, bestAgeErr]
+                    dat = np.array(list(map(float, dat)))
+                    errors.append(dat / 2.)
 
                 else:
                     errors.append(main_byid_df.loc[sample, bestAgeErr])
@@ -4236,9 +4242,12 @@ def find_youngest_cluster(data_err1s, sample_list, min_cluster_size=2):
         tops = l + m
         bottoms = l - m
         
-        if (bigtop >= bottoms) and (bigbottom <= tops):
-            cluster.append([l,m,n,o,p,q])
-            age_cluster.append([l,m])
+        try: 
+            if (bigtop >= bottoms) and (bigbottom <= tops):
+                cluster.append([l,m,n,o,p,q])
+                age_cluster.append([l,m])
+        except:
+            pass
             
          
     for i in range(N):
